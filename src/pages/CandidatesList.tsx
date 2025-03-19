@@ -7,6 +7,12 @@ import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { mockCandidates } from '@/data/mockData';
 
 const CandidatesList = () => {
+  // Convert string status values to the expected union type
+  const typedCandidates = mockCandidates.map(candidate => ({
+    ...candidate,
+    status: candidate.status as "completed" | "pending" | "expired"
+  }));
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -20,7 +26,7 @@ const CandidatesList = () => {
           />
           
           <div className="mt-8 animate-fade-in">
-            <CandidatesTable candidates={mockCandidates} />
+            <CandidatesTable candidates={typedCandidates} />
           </div>
         </div>
       </main>
