@@ -11,6 +11,18 @@ import { PieChart, User, Mail, CheckCircle } from 'lucide-react';
 import CandidatesTable from '@/components/dashboard/CandidatesTable';
 
 const Dashboard = () => {
+  // Convert string status values to the expected union types
+  const typedTests = mockTests.map(test => ({
+    ...test,
+    status: test.status as "active" | "draft" | "archived"
+  }));
+  
+  // Convert string status values to the expected union types for candidates
+  const typedCandidates = mockCandidates.map(candidate => ({
+    ...candidate,
+    status: candidate.status as "completed" | "pending" | "expired"
+  }));
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -93,10 +105,10 @@ const Dashboard = () => {
               <TabsTrigger value="candidates">Candidates</TabsTrigger>
             </TabsList>
             <TabsContent value="tests" className="mt-4">
-              <TestsTable tests={mockTests} />
+              <TestsTable tests={typedTests} />
             </TabsContent>
             <TabsContent value="candidates" className="mt-4">
-              <CandidatesTable candidates={mockCandidates} />
+              <CandidatesTable candidates={typedCandidates} />
             </TabsContent>
           </Tabs>
         </div>
