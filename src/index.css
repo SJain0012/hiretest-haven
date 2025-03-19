@@ -45,6 +45,11 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Blue gradient colors */
+    --blue-light: 210 100% 92%;
+    --blue-medium: 210 100% 60%;
+    --blue-dark: 220 80% 45%;
   }
 
   .dark {
@@ -84,6 +89,11 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Blue gradient colors - darker for dark mode */
+    --blue-light: 210 80% 20%;
+    --blue-medium: 210 80% 35%;
+    --blue-dark: 220 70% 45%;
   }
 }
 
@@ -96,6 +106,36 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+/* Blue Gradient Backgrounds */
+.bg-blue-gradient {
+  background: linear-gradient(135deg, hsl(var(--blue-light)) 0%, hsl(var(--blue-medium)) 50%, hsl(var(--blue-dark)) 100%);
+}
+
+.bg-blue-gradient-soft {
+  background: linear-gradient(109.6deg, rgba(223,234,247,1) 11.2%, rgba(244,248,252,1) 91.1%);
+}
+
+.bg-card-gradient {
+  background: linear-gradient(to right, #ffffff, #f0f8ff);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #D3E4FD 0%, #0EA5E9 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+.nav-gradient {
+  background: linear-gradient(90deg, hsla(216, 41%, 79%, 1) 0%, hsla(186, 33%, 94%, 1) 100%);
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* Custom transitions */
@@ -141,6 +181,18 @@
 .btn-hover:hover::after {
   transform: scaleX(1);
   transform-origin: left;
+}
+
+/* Blue gradient button */
+.btn-blue-gradient {
+  background: linear-gradient(90deg, hsl(var(--blue-medium)), hsl(var(--blue-dark)));
+  background-size: 200% auto;
+  transition: 0.5s;
+}
+
+.btn-blue-gradient:hover {
+  background-position: right center;
+  box-shadow: 0 0 20px rgba(66, 153, 225, 0.5);
 }
 
 /* Custom scrollbar */

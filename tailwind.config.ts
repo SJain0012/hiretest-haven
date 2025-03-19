@@ -65,6 +65,11 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				blue: {
+					light: 'hsl(var(--blue-light))',
+					medium: 'hsl(var(--blue-medium))',
+					dark: 'hsl(var(--blue-dark))'
 				}
 			},
 			borderRadius: {
@@ -96,6 +101,10 @@ export default {
 				'scale-in': {
 					from: { transform: 'scale(0.95)', opacity: '0' },
 					to: { transform: 'scale(1)', opacity: '1' }
+				},
+				'gradient-shift': {
+					'0%, 100%': { backgroundPosition: '0% 50%' },
+					'50%': { backgroundPosition: '100% 50%' }
 				}
 			},
 			animation: {
@@ -104,7 +113,13 @@ export default {
 				'fade-in': 'fade-in 0.3s ease-out',
 				'fade-out': 'fade-out 0.3s ease-out',
 				'slide-in': 'slide-in 0.4s ease-out',
-				'scale-in': 'scale-in 0.3s ease-out'
+				'scale-in': 'scale-in 0.3s ease-out',
+				'gradient-shift': 'gradient-shift 15s ease infinite'
+			},
+			backgroundImage: {
+				'blue-gradient': 'linear-gradient(135deg, #D3E4FD 0%, #0EA5E9 100%)',
+				'blue-gradient-soft': 'linear-gradient(109.6deg, rgba(223,234,247,1) 11.2%, rgba(244,248,252,1) 91.1%)',
+				'blue-gradient-card': 'linear-gradient(to right, #ffffff, #f0f8ff)',
 			}
 		}
 	},

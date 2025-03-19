@@ -1,3 +1,4 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -12,10 +13,10 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em #0EA5E9);
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em #33C3F0);
 }
 
 @keyframes logo-spin {
@@ -39,4 +40,27 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Blue gradient card styles */
+.blue-card {
+  background: linear-gradient(to right, #ffffff, #f0f8ff);
+  border-radius: var(--radius);
+  border: 1px solid rgba(66, 153, 225, 0.2);
+  box-shadow: 0 10px 25px -5px rgba(66, 153, 225, 0.1);
+  transition: all 0.3s ease;
+}
+
+.blue-card:hover {
+  box-shadow: 0 20px 25px -5px rgba(66, 153, 225, 0.2);
+  transform: translateY(-4px);
+}
+
+/* Blue gradient text */
+.blue-gradient-text {
+  background: linear-gradient(90deg, #0EA5E9, #33C3F0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
 }
