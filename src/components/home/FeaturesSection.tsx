@@ -37,7 +37,7 @@ const features = [
 
 const FeaturesSection = () => {
   return (
-    <section className="w-full py-24 bg-secondary/50">
+    <section className="w-full py-24 bg-blue-gradient-soft">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="space-y-2">
@@ -45,7 +45,7 @@ const FeaturesSection = () => {
               Key Features
             </div>
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-              Everything You Need
+              Everything You <span className="blue-gradient-text">Need</span>
             </h2>
             <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg">
               Our platform offers comprehensive tools to streamline your recruitment process.
@@ -55,12 +55,12 @@ const FeaturesSection = () => {
             {features.map((feature, index) => (
               <div 
                 key={index} 
-                className="flex flex-col items-center gap-2 rounded-xl bg-background p-6 text-center shadow-sm border border-border card-hover"
+                className="blue-card flex flex-col items-center gap-2 rounded-xl p-6 text-center"
               >
-                <div className="rounded-full bg-primary/10 p-3 text-primary">
+                <div className="rounded-full bg-blue-light/30 p-3 text-blue-dark">
                   {feature.icon}
                 </div>
-                <h3 className="text-xl font-bold">{feature.title}</h3>
+                <h3 className="text-xl font-bold text-blue-dark">{feature.title}</h3>
                 <p className="text-muted-foreground">{feature.description}</p>
               </div>
             ))}

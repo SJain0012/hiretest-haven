@@ -25,7 +25,7 @@ const Index = () => {
                   Simple Process
                 </div>
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  How It Works
+                  How It <span className="blue-gradient-text">Works</span>
                 </h2>
                 <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg">
                   Our streamlined process makes personality testing easy for both hiring teams and candidates.
@@ -33,31 +33,31 @@ const Index = () => {
               </div>
               
               <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
-                <div className="flex flex-col items-center text-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-                    <PieChart className="h-8 w-8 text-primary" />
+                <div className="flex flex-col items-center text-center blue-card p-8">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-light/30 mb-4">
+                    <PieChart className="h-8 w-8 text-blue-medium" />
                   </div>
-                  <h3 className="text-xl font-bold">1. Create Test</h3>
+                  <h3 className="text-xl font-bold text-blue-dark">1. Create Test</h3>
                   <p className="mt-2 text-muted-foreground">
                     Build customized personality assessments with our intuitive test creator.
                   </p>
                 </div>
                 
-                <div className="flex flex-col items-center text-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-                    <Mail className="h-8 w-8 text-primary" />
+                <div className="flex flex-col items-center text-center blue-card p-8">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-light/30 mb-4">
+                    <Mail className="h-8 w-8 text-blue-medium" />
                   </div>
-                  <h3 className="text-xl font-bold">2. Invite Candidates</h3>
+                  <h3 className="text-xl font-bold text-blue-dark">2. Invite Candidates</h3>
                   <p className="mt-2 text-muted-foreground">
                     Send personalized invitations to candidates with secure test links.
                   </p>
                 </div>
                 
-                <div className="flex flex-col items-center text-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-                    <Check className="h-8 w-8 text-primary" />
+                <div className="flex flex-col items-center text-center blue-card p-8">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-light/30 mb-4">
+                    <Check className="h-8 w-8 text-blue-medium" />
                   </div>
-                  <h3 className="text-xl font-bold">3. Review Results</h3>
+                  <h3 className="text-xl font-bold text-blue-dark">3. Review Results</h3>
                   <p className="mt-2 text-muted-foreground">
                     Analyze comprehensive personality insights through intuitive visualizations.
                   </p>
@@ -66,7 +66,7 @@ const Index = () => {
               
               <div className="mt-16">
                 <Link to="/dashboard">
-                  <Button size="lg" className="btn-hover">
+                  <Button size="lg" className="btn-blue-gradient text-white">
                     Start Creating Tests
                   </Button>
                 </Link>
@@ -76,20 +76,20 @@ const Index = () => {
         </section>
         
         {/* CTA Section */}
-        <section className="w-full py-24 bg-primary/5">
+        <section className="w-full py-24 bg-blue-gradient text-white">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center gap-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">
                   Ready to Improve Your Hiring Process?
                 </h2>
-                <p className="mx-auto max-w-[600px] text-muted-foreground md:text-lg">
+                <p className="mx-auto max-w-[600px] text-white/80 md:text-lg">
                   Join hundreds of companies finding their perfect candidates through better personality insights.
                 </p>
               </div>
               <div className="mt-6">
                 <Link to="/dashboard">
-                  <Button size="lg" className="btn-hover">
+                  <Button size="lg" className="bg-white/20 hover:bg-white/30 text-white border-white/10">
                     Get Started Now
                   </Button>
                 </Link>
