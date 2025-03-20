@@ -31,6 +31,8 @@ interface Candidate {
 
 interface CandidatesTableProps {
   candidates: Candidate[];
+  onCandidateSelect?: (candidate: Candidate) => void;
+  selectedCandidateId?: string;
 }
 
 const statusColorMap = {
@@ -39,7 +41,11 @@ const statusColorMap = {
   expired: 'bg-gray-100 text-gray-800 hover:bg-gray-200',
 };
 
-const CandidatesTable: React.FC<CandidatesTableProps> = ({ candidates }) => {
+const CandidatesTable: React.FC<CandidatesTableProps> = ({ 
+  candidates, 
+  onCandidateSelect,
+  selectedCandidateId 
+}) => {
   return (
     <div className="rounded-md border">
       <Table>
@@ -54,7 +60,14 @@ const CandidatesTable: React.FC<CandidatesTableProps> = ({ candidates }) => {
         </TableHeader>
         <TableBody>
           {candidates.map((candidate) => (
-            <TableRow key={candidate.id} className="transition-colors hover:bg-muted/50">
+            <TableRow 
+              key={candidate.id} 
+              className={`transition-colors hover:bg-muted/50 ${
+                selectedCandidateId === candidate.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+              }`}
+              onClick={() => onCandidateSelect && onCandidateSelect(candidate)}
+              style={{ cursor: onCandidateSelect ? 'pointer' : 'default' }}
+            >
               <TableCell>
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8">
@@ -85,27 +98,32 @@ const CandidatesTable: React.FC<CandidatesTableProps> = ({ candidates }) => {
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
                   {candidate.status === 'completed' && (
-                    <Link to={`/candidates/${candidate.id}/results`}>
-                      <Button variant="ghost" size="icon">
-                        <PieChart className="h-4 w-4" />
-                        <span className="sr-only">Results</span>
-                      </Button>
-                    </Link>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCandidateSelect && onCandidateSelect(candidate);
+                      }}
+                    >
+                      <PieChart className="h-4 w-4" />
+                      <span className="sr-only">Results</span>
+                    </Button>
                   )}
-                  <Link to={`/candidates/${candidate.id}`}>
+                  <Link to={`/candidates/${candidate.id}`} onClick={(e) => e.stopPropagation()}>
                     <Button variant="ghost" size="icon">
                       <Eye className="h-4 w-4" />
                       <span className="sr-only">View</span>
                     </Button>
                   </Link>
                   {candidate.status === 'pending' && (
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()}>
                       <Mail className="h-4 w-4" />
                       <span className="sr-only">Resend</span>
                     </Button>
                   )}
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
+                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                       <Button variant="ghost" size="icon">
                         <MoreHorizontal className="h-4 w-4" />
                         <span className="sr-only">More</span>

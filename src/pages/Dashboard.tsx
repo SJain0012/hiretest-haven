@@ -1,14 +1,15 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import TestsTable from '@/components/dashboard/TestsTable';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { mockTests, mockCandidates } from '@/data/mockData';
+import { mockTests, mockCandidates, mockTraits } from '@/data/mockData';
 import { PieChart, User, Mail, CheckCircle } from 'lucide-react';
 import CandidatesTable from '@/components/dashboard/CandidatesTable';
+import PersonalityChart from '@/components/results/PersonalityChart';
 
 const Dashboard = () => {
   // Convert string status values to the expected union types
@@ -22,6 +23,11 @@ const Dashboard = () => {
     ...candidate,
     status: candidate.status as "completed" | "pending" | "expired"
   }));
+
+  // State to track the selected candidate
+  const [selectedCandidate, setSelectedCandidate] = useState(
+    typedCandidates.find(c => c.status === 'completed') || typedCandidates[0]
+  );
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -99,6 +105,17 @@ const Dashboard = () => {
             </Card>
           </div>
           
+          {/* Add personality results section */}
+          {selectedCandidate && selectedCandidate.status === 'completed' && (
+            <div className="my-8 animate-fade-in">
+              <h2 className="text-2xl font-bold mb-4">Candidate Results</h2>
+              <PersonalityChart 
+                data={mockTraits} 
+                candidateName={selectedCandidate.name} 
+              />
+            </div>
+          )}
+          
           <Tabs defaultValue="tests" className="mt-8 animate-fade-in">
             <TabsList>
               <TabsTrigger value="tests">Tests</TabsTrigger>
@@ -108,7 +125,11 @@ const Dashboard = () => {
               <TestsTable tests={typedTests} />
             </TabsContent>
             <TabsContent value="candidates" className="mt-4">
-              <CandidatesTable candidates={typedCandidates} />
+              <CandidatesTable 
+                candidates={typedCandidates} 
+                onCandidateSelect={(candidate) => setSelectedCandidate(candidate)}
+                selectedCandidateId={selectedCandidate?.id}
+              />
             </TabsContent>
           </Tabs>
         </div>
