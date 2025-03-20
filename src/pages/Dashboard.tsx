@@ -11,6 +11,16 @@ import { PieChart, User, Mail, CheckCircle } from 'lucide-react';
 import CandidatesTable from '@/components/dashboard/CandidatesTable';
 import PersonalityChart from '@/components/results/PersonalityChart';
 
+// Define Candidate type to match what's in CandidatesTable
+interface Candidate {
+  id: string;
+  name: string;
+  email: string;
+  status: "pending" | "completed" | "expired";
+  testName: string;
+  completedDate?: string;
+}
+
 const Dashboard = () => {
   // Convert string status values to the expected union types
   const typedTests = mockTests.map(test => ({
@@ -25,8 +35,8 @@ const Dashboard = () => {
   }));
 
   // State to track the selected candidate
-  const [selectedCandidate, setSelectedCandidate] = useState(
-    typedCandidates.find(c => c.status === 'completed') || typedCandidates[0]
+  const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(
+    typedCandidates.find(c => c.status === 'completed') || null
   );
   
   return (
@@ -127,7 +137,7 @@ const Dashboard = () => {
             <TabsContent value="candidates" className="mt-4">
               <CandidatesTable 
                 candidates={typedCandidates} 
-                onCandidateSelect={(candidate) => setSelectedCandidate(candidate)}
+                onCandidateSelect={setSelectedCandidate}
                 selectedCandidateId={selectedCandidate?.id}
               />
             </TabsContent>

@@ -13,13 +13,14 @@ interface PersonalityTrait {
 interface PersonalityChartProps {
   data: PersonalityTrait[];
   candidateName: string;
+  compact?: boolean;
 }
 
 // Custom colors with opacity for the radar fill
 const RADAR_FILL_COLOR = 'rgba(14, 165, 233, 0.3)';
 const RADAR_STROKE_COLOR = 'rgba(14, 165, 233, 0.8)';
 
-const PersonalityChart: React.FC<PersonalityChartProps> = ({ data, candidateName }) => {
+const PersonalityChart: React.FC<PersonalityChartProps> = ({ data, candidateName, compact = false }) => {
   // Transform data for RadarChart
   const chartData = data.map((item) => ({
     trait: item.trait,
@@ -31,6 +32,30 @@ const PersonalityChart: React.FC<PersonalityChartProps> = ({ data, candidateName
     personality: { label: "Personality Score", color: "#0EA5E9" },
   };
 
+  // If in compact mode (for share dialog), render simplified version
+  if (compact) {
+    return (
+      <div className="w-full h-full">
+        <ChartContainer config={chartConfig} className="h-full">
+          <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
+            <PolarGrid strokeDasharray="3 3" />
+            <PolarAngleAxis dataKey="trait" tick={{ fill: '#6b7280', fontSize: 10 }} />
+            <PolarRadiusAxis domain={[0, 100]} tick={{ fill: '#6b7280' }} axisLine={false} tickCount={3} />
+            <Radar
+              name="Personality"
+              dataKey="value"
+              stroke={RADAR_STROKE_COLOR}
+              fill={RADAR_FILL_COLOR}
+              fillOpacity={0.7}
+            />
+            <ChartTooltip content={<ChartTooltipContent />} />
+          </RadarChart>
+        </ChartContainer>
+      </div>
+    );
+  }
+
+  // Original full-sized version
   return (
     <Card className="overflow-hidden blue-card">
       <CardHeader className="pb-2">
