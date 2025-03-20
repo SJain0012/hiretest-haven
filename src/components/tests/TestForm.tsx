@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { PlusCircle, X, GripVertical } from 'lucide-react';
+import { PlusCircle, X, GripVertical, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -15,6 +14,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { AIQuestionGenerator } from '@/components/tests/AIQuestionGenerator';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 interface Question {
   id: string;
@@ -31,6 +39,7 @@ const TestForm = () => {
   const [testName, setTestName] = useState('');
   const [testDescription, setTestDescription] = useState('');
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
 
   const addQuestion = (type: Question['type']) => {
     const newQuestion: Question = {
@@ -105,7 +114,6 @@ const TestForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation
     if (!testName.trim()) {
       toast({
         title: "Required Field Missing",
@@ -124,7 +132,6 @@ const TestForm = () => {
       return;
     }
     
-    // Check if all questions have text
     const incompleteQuestions = questions.filter(q => !q.text.trim());
     if (incompleteQuestions.length > 0) {
       toast({
@@ -135,12 +142,21 @@ const TestForm = () => {
       return;
     }
     
-    // In a real app, we would save the test here
     console.log({ testName, testDescription, questions });
     
     toast({
       title: "Test Created",
       description: "Your personality test has been created successfully.",
+    });
+  };
+
+  const addAIGeneratedQuestions = (generatedQuestions: Question[]) => {
+    setQuestions([...questions, ...generatedQuestions]);
+    setIsAIDialogOpen(false);
+    
+    toast({
+      title: "Questions Added",
+      description: `${generatedQuestions.length} AI-generated questions have been added to your test.`,
     });
   };
 
@@ -175,6 +191,24 @@ const TestForm = () => {
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">Questions</h2>
           <div className="flex gap-2">
+            <Dialog open={isAIDialogOpen} onOpenChange={setIsAIDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="gap-2">
+                  <Wand2 className="h-4 w-4" />
+                  Generate with AI
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px]">
+                <DialogHeader>
+                  <DialogTitle>Generate Questions with AI</DialogTitle>
+                  <DialogDescription>
+                    Select personality traits you want to assess and let AI generate questions for you.
+                  </DialogDescription>
+                </DialogHeader>
+                <AIQuestionGenerator onQuestionsGenerated={addAIGeneratedQuestions} />
+              </DialogContent>
+            </Dialog>
+            
             <Select onValueChange={(value) => addQuestion(value as Question['type'])}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Add Question" />
