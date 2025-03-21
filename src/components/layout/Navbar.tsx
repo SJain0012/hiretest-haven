@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { User, PieChart, Mail } from 'lucide-react';
+import { User, PieChart, Mail, Users } from 'lucide-react';
 
 const Navbar = () => {
   return (
@@ -25,6 +25,9 @@ const Navbar = () => {
           <Link to="/candidates" className="text-sm font-medium transition-colors hover:text-primary/80">
             Candidates
           </Link>
+          <Link to="/team" className="text-sm font-medium transition-colors hover:text-primary/80">
+            Team
+          </Link>
           <Link to="/pricing" className="text-sm font-medium transition-colors hover:text-primary/80">
             Pricing
           </Link>
@@ -41,6 +44,12 @@ const Navbar = () => {
             <Button variant="ghost" size="icon" className="rounded-full">
               <Mail className="h-5 w-5" />
               <span className="sr-only">Messages</span>
+            </Button>
+          </Link>
+          <Link to="/team">
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <Users className="h-5 w-5" />
+              <span className="sr-only">Team</span>
             </Button>
           </Link>
           <Link to="/profile">
