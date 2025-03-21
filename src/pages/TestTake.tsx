@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { mockTestQuestions } from '@/data/mockData';
 import { ArrowLeft, ArrowRight, Send } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 const TestTake = () => {
   const { testId } = useParams<{ testId: string }>();
@@ -26,6 +27,10 @@ const TestTake = () => {
   
   const questions = mockTestQuestions;
   const currentQuestion = questions[currentQuestionIndex];
+  
+  // Calculate progress percentage
+  const answeredQuestions = Object.keys(answers).length;
+  const progressPercentage = (answeredQuestions / questions.length) * 100;
   
   const handleStartTest = () => {
     if (!candidateName.trim() || !candidateEmail.trim()) {
@@ -177,16 +182,16 @@ const TestTake = () => {
       <Card className="max-w-2xl w-full animate-fade-in">
         <CardContent className="pt-6">
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">
-                Question {currentQuestionIndex + 1} of {questions.length}
+            <div className="flex flex-col space-y-2">
+              <div className="flex justify-between items-center">
+                <div className="text-sm text-muted-foreground">
+                  Question {currentQuestionIndex + 1} of {questions.length}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {answeredQuestions} of {questions.length} answered
+                </div>
               </div>
-              <div className="flex h-2 w-full max-w-24 rounded-full bg-secondary">
-                <div
-                  className="h-full rounded-full bg-primary transition-all"
-                  style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
-                />
-              </div>
+              <Progress value={progressPercentage} className="h-2" />
             </div>
             
             <div>
