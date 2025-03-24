@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -7,17 +6,13 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/home/HeroSection';
 import FeaturesSection from '@/components/home/FeaturesSection';
+import WaitlistSection from '@/components/home/WaitlistSection';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { PieChart, Mail, Check, Users, TrendingUp, PiggyBank, Timer, Heart } from 'lucide-react';
+import { PieChart, Mail, Check, Users, TrendingUp, PiggyBank, Timer } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { toast } from "sonner";
-import { GridBackground } from "@/components/ui/grid-background";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Icons } from "@/components/ui/icons";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -41,7 +36,6 @@ const Index = () => {
     // Simulate API call with a timeout
     setTimeout(() => {
       console.log("Form submitted:", values);
-      toast.success("Thank you for signing up! We'll be in touch soon.");
       form.reset();
       setIsSubmitting(false);
     }, 1000);
@@ -181,72 +175,8 @@ const Index = () => {
           </div>
         </section>
         
-        {/* Early Adopter Sign-up Section - Replaced with new waitlist component */}
-        <section className="w-full py-24 relative">
-          <GridBackground />
-          <div className="relative z-10 container px-4 md:px-6">
-            <div className="w-full max-w-xl mx-auto p-8 space-y-12">
-              <div className="space-y-6 text-center">
-                <h2 className="text-4xl sm:text-5xl font-extrabold text-center bg-clip-text text-transparent bg-gradient-to-br from-gray-200 to-gray-600">
-                  Join Our Product Launch Waitlist
-                </h2>
-                <p className="text-xl text-gray-400 max-w-lg mx-auto">
-                  Be part of something truly extraordinary. Join thousands of others
-                  already gaining early access to our revolutionary personality testing platform.
-                </p>
-              </div>
-
-              <div className="flex gap-2 max-w-md mx-auto">
-                <Input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="h-12 bg-gray-950/50 border-gray-800"
-                />
-                <Button
-                  className="h-12 px-6 bg-black hover:bg-black/90 text-white"
-                  variant="ghost"
-                  onClick={() => toast.success("Thank you for joining our waitlist!")}
-                >
-                  Get Notified
-                </Button>
-              </div>
-
-              <div className="flex flex-col items-center gap-8">
-                <div className="flex items-center gap-4">
-                  <div className="flex -space-x-3">
-                    <Avatar className="border-2 w-12 h-12">
-                      <AvatarFallback className="text-sm font-semibold border-white/20 bg-purple-600">JD</AvatarFallback>
-                    </Avatar>
-                    <Avatar className="border-2 w-12 h-12">
-                      <AvatarFallback className="text-sm font-semibold border-white/20 bg-blue-600">AS</AvatarFallback>
-                    </Avatar>
-                    <Avatar className="border-2 w-12 h-12">
-                      <AvatarFallback className="text-sm font-semibold border-white/20 bg-blue-700">MK</AvatarFallback>
-                    </Avatar>
-                  </div>
-                  <span className="font-bold text-white">100+ people on the waitlist</span>
-                </div>
-
-                <div className="flex gap-6 justify-center">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-gray-400 hover:text-gray-300"
-                  >
-                    <Icons.twitter className="w-5 h-5 fill-current" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-gray-400 hover:text-gray-300"
-                  >
-                    <Icons.gitHub className="w-5 h-5 fill-current" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* Waitlist Section - Extracted to a separate component */}
+        <WaitlistSection />
         
         {/* CTA Section */}
         <section className="w-full py-24 bg-blue-gradient text-white">
