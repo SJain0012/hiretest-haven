@@ -1,14 +1,14 @@
 
 import { cn } from "@/lib/utils";
 import {
-  IconAdjustmentsBolt,
-  IconCloud,
-  IconCurrencyDollar,
-  IconEaseInOut,
-  IconHeart,
-  IconHelp,
-  IconRouteAltLeft,
-  IconTerminal2,
+  IconChartPie,
+  IconSend,
+  IconUserCircle,
+  IconBuildingStore,
+  IconFilter,
+  IconUsers,
+  IconPercentage,
+  IconHeadset,
 } from "@tabler/icons-react";
 
 const features = [
@@ -16,47 +16,47 @@ const features = [
     title: "Insightful Analytics",
     description:
       "Visualize personality data with elegant charts and graphs to identify the perfect candidate fit.",
-    icon: <IconAdjustmentsBolt className="h-6 w-6" />,
+    icon: <IconChartPie className="h-6 w-6" />,
   },
   {
     title: "Automated Invitations",
     description:
       "Send personalized test invitations to candidates with just a few clicks.",
-    icon: <IconEaseInOut className="h-6 w-6" />,
+    icon: <IconSend className="h-6 w-6" />,
   },
   {
     title: "Candidate Profiles",
     description:
       "Build comprehensive profiles based on personality test results and other data points.",
-    icon: <IconTerminal2 className="h-6 w-6" />,
+    icon: <IconUserCircle className="h-6 w-6" />,
   },
   {
     title: "Customizable Tests",
     description: "Create personalized questionnaires tailored to your specific hiring needs.",
-    icon: <IconCurrencyDollar className="h-6 w-6" />,
+    icon: <IconBuildingStore className="h-6 w-6" />,
   },
   {
     title: "Advanced Filtering",
     description:
       "Quickly find candidates matching specific personality traits and attributes.",
-    icon: <IconCloud className="h-6 w-6" />,
+    icon: <IconFilter className="h-6 w-6" />,
   },
   {
     title: "Team Collaboration",
     description:
       "Share insights and feedback with your team to make collective hiring decisions.",
-    icon: <IconRouteAltLeft className="h-6 w-6" />,
+    icon: <IconUsers className="h-6 w-6" />,
   },
   {
     title: "50% Discount Access",
     description:
       "Early adopters get 50% off any plan when we launch. Join the waitlist today.",
-    icon: <IconHelp className="h-6 w-6" />,
+    icon: <IconPercentage className="h-6 w-6" />,
   },
   {
     title: "Priority Support",
     description: "Get priority access to our support team and product updates.",
-    icon: <IconHeart className="h-6 w-6" />,
+    icon: <IconHeadset className="h-6 w-6" />,
   },
 ];
 
