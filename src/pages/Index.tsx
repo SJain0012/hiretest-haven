@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -15,9 +14,6 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-import { GridBackground } from "@/components/ui/grid-background";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Icons } from "@/components/ui/icons";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -181,67 +177,101 @@ const Index = () => {
           </div>
         </section>
         
-        {/* Early Adopter Sign-up Section - Replaced with new waitlist component */}
-        <section className="w-full py-24 relative">
-          <GridBackground />
-          <div className="relative z-10 container px-4 md:px-6">
-            <div className="w-full max-w-xl mx-auto p-8 space-y-12">
-              <div className="space-y-6 text-center">
-                <h2 className="text-4xl sm:text-5xl font-extrabold text-center bg-clip-text text-transparent bg-gradient-to-br from-gray-200 to-gray-600">
-                  Join Our Product Launch Waitlist
+        {/* Early Adopter Sign-up Section */}
+        <section className="w-full py-24 bg-blue-gradient-soft">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center gap-4 text-center">
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm">
+                  <Heart className="h-4 w-4 text-blue-medium" />
+                  <span>Limited Time Offer</span>
+                </div>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                  Join Our <span className="blue-gradient-text">Early Adopters</span>
                 </h2>
-                <p className="text-xl text-gray-400 max-w-lg mx-auto">
-                  Be part of something truly extraordinary. Join thousands of others
-                  already gaining early access to our revolutionary personality testing platform.
+                <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg">
+                  Sign up today to be notified when we launch and receive an exclusive 50% discount on any plan.
                 </p>
               </div>
-
-              <div className="flex gap-2 max-w-md mx-auto">
-                <Input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="h-12 bg-gray-950/50 border-gray-800"
-                />
-                <Button
-                  className="h-12 px-6 bg-black hover:bg-black/90 text-white"
-                  variant="ghost"
-                  onClick={() => toast.success("Thank you for joining our waitlist!")}
-                >
-                  Get Notified
-                </Button>
-              </div>
-
-              <div className="flex flex-col items-center gap-8">
-                <div className="flex items-center gap-4">
-                  <div className="flex -space-x-3">
-                    <Avatar className="border-2 w-12 h-12">
-                      <AvatarFallback className="text-sm font-semibold border-white/20 bg-purple-600">JD</AvatarFallback>
-                    </Avatar>
-                    <Avatar className="border-2 w-12 h-12">
-                      <AvatarFallback className="text-sm font-semibold border-white/20 bg-blue-600">AS</AvatarFallback>
-                    </Avatar>
-                    <Avatar className="border-2 w-12 h-12">
-                      <AvatarFallback className="text-sm font-semibold border-white/20 bg-blue-700">MK</AvatarFallback>
-                    </Avatar>
+              
+              <Card className="mt-8 w-full max-w-md border-blue-light/30 bg-white/80">
+                <CardContent className="pt-6">
+                  <div className="mb-4 flex justify-center">
+                    <Badge variant="secondary" className="bg-blue-light/20 text-blue-dark px-3 py-1">
+                      50% OFF for Early Adopters
+                    </Badge>
                   </div>
-                  <span className="font-bold text-white">100+ people on the waitlist</span>
+                  
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Full Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter your name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email Address</FormLabel>
+                            <FormControl>
+                              <Input placeholder="you@example.com" type="email" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <Button 
+                        type="submit" 
+                        className="w-full btn-blue-gradient text-white"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? (
+                          <span className="flex items-center gap-2">
+                            <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Processing...
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-2">
+                            Get Early Access <Mail className="h-4 w-4" />
+                          </span>
+                        )}
+                      </Button>
+                      
+                      <p className="text-xs text-muted-foreground text-center">
+                        By signing up, you'll be the first to know when we launch and receive your exclusive discount code.
+                      </p>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
+              
+              <div className="mt-8 flex flex-col items-center gap-2">
+                <div className="flex items-center gap-1 text-sm text-blue-dark">
+                  <Check className="h-4 w-4 text-blue-medium" />
+                  <span>No credit card required</span>
                 </div>
-
-                <div className="flex gap-6 justify-center">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-gray-400 hover:text-gray-300"
-                  >
-                    <Icons.twitter className="w-5 h-5 fill-current" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-gray-400 hover:text-gray-300"
-                  >
-                    <Icons.gitHub className="w-5 h-5 fill-current" />
-                  </Button>
+                <div className="flex items-center gap-1 text-sm text-blue-dark">
+                  <Check className="h-4 w-4 text-blue-medium" />
+                  <span>Cancel anytime</span>
+                </div>
+                <div className="flex items-center gap-1 text-sm text-blue-dark">
+                  <Check className="h-4 w-4 text-blue-medium" />
+                  <span>Priority support</span>
                 </div>
               </div>
             </div>
