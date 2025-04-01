@@ -15,6 +15,7 @@ import TestTake from "./pages/TestTake";
 import NotFound from "./pages/NotFound";
 import Pricing from "./pages/Pricing";
 import TeamPage from "./pages/TeamPage";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
           <Route path="/take-test/:testId" element={<TestTake />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/team" element={<TeamPage />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
