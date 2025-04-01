@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -6,7 +7,8 @@ import { mockTests, mockCandidates, mockTraits } from '@/data/mockData';
 import PersonalityChart from '@/components/results/PersonalityChart';
 import DashboardCards from '@/components/dashboard/DashboardCards';
 import CreditTopupDialog from '@/components/dashboard/CreditTopupDialog';
-import DashboardTabs, { DashboardTest, Candidate } from '@/components/dashboard/DashboardTabs';
+import DashboardTabs, { DashboardTest } from '@/components/dashboard/DashboardTabs';
+import { Candidate } from '@/types/candidate';
 
 const Dashboard = () => {
   // Convert mockTests to DashboardTest type
@@ -19,7 +21,7 @@ const Dashboard = () => {
   const typedCandidates = mockCandidates.map(candidate => ({
     ...candidate,
     status: candidate.status as "completed" | "pending" | "expired"
-  }));
+  })) as Candidate[];
 
   // State to track the selected candidate
   const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(

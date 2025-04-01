@@ -3,6 +3,7 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import TestsTabContent from '@/components/dashboard/tabs/TestsTabContent';
 import CandidatesTabContent from '@/components/dashboard/tabs/CandidatesTabContent';
+import { Candidate } from '@/types/candidate';
 
 // Modify the Test interface to match the expected properties from Dashboard.tsx
 export interface DashboardTest {
@@ -12,15 +13,6 @@ export interface DashboardTest {
   createdAt: string;
   candidatesCount: number;
   completionRate: number;
-}
-
-export interface Candidate {
-  id: string;
-  name: string;
-  email: string;
-  status: "pending" | "completed" | "expired";
-  testName: string;
-  completedDate?: string;
 }
 
 interface DashboardTabsProps {

@@ -5,7 +5,7 @@ import Footer from '@/components/layout/Footer';
 import CandidatesTabContent from '@/components/dashboard/tabs/CandidatesTabContent';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import { mockCandidates } from '@/data/mockData';
-import { Candidate } from '@/components/dashboard/DashboardTabs';
+import { Candidate } from '@/types/candidate';
 
 const CandidatesList = () => {
   // Convert string status values to the expected union type
