@@ -1,19 +1,20 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import TestsTable from '@/components/dashboard/TestsTable';
-import CandidatesTable from '@/components/dashboard/CandidatesTable';
+import TestsTabContent from '@/components/dashboard/tabs/TestsTabContent';
+import CandidatesTabContent from '@/components/dashboard/tabs/CandidatesTabContent';
 
-interface Test {
+// Modify the Test interface to match the expected properties from Dashboard.tsx
+export interface DashboardTest {
   id: string;
   name: string;
   status: "active" | "draft" | "archived";
-  questions: number;
-  candidates: number;
-  created: string;
+  createdAt: string;
+  candidatesCount: number;
+  completionRate: number;
 }
 
-interface Candidate {
+export interface Candidate {
   id: string;
   name: string;
   email: string;
@@ -23,7 +24,7 @@ interface Candidate {
 }
 
 interface DashboardTabsProps {
-  tests: Test[];
+  tests: DashboardTest[];
   candidates: Candidate[];
   selectedCandidate: Candidate | null;
   onCandidateSelect: (candidate: Candidate) => void;
@@ -42,10 +43,10 @@ const DashboardTabs = ({
         <TabsTrigger value="candidates">Candidates</TabsTrigger>
       </TabsList>
       <TabsContent value="tests" className="mt-4">
-        <TestsTable tests={tests} />
+        <TestsTabContent tests={tests} />
       </TabsContent>
       <TabsContent value="candidates" className="mt-4">
-        <CandidatesTable 
+        <CandidatesTabContent 
           candidates={candidates} 
           onCandidateSelect={onCandidateSelect}
           selectedCandidateId={selectedCandidate?.id}
