@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import PersonalityChart from '@/components/results/PersonalityChart';
 import { mockTraits } from '@/data/mockData';
 import { Candidate } from '@/types/candidate';
-import CandidateInsights from '@/components/results/CandidateInsights';
+import { LightbulbIcon, HelpCircleIcon } from 'lucide-react';
 
 // Sample insights - in a real app these would come from an API or analysis of the candidate's answers
 const mockInsights = [
@@ -48,11 +48,20 @@ const CandidateResultPreview: React.FC<CandidateResultPreviewProps> = ({
           />
         </div>
         <div className="md:w-2/5">
-          <CandidateInsights
-            candidateName={candidate.name}
-            insights={mockInsights}
-            compact={true}
-          />
+          <div className="px-4 py-2">
+            <h4 className="text-sm font-semibold mb-2">Key Insights</h4>
+            <ul className="text-xs space-y-1">
+              {mockInsights.map((insight, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  {insight.type === 'finding' ? 
+                    <LightbulbIcon className="h-3 w-3 text-amber-500 mt-0.5 flex-shrink-0" /> : 
+                    <HelpCircleIcon className="h-3 w-3 text-blue-500 mt-0.5 flex-shrink-0" />
+                  }
+                  <span className="text-muted-foreground">{insight.text}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
       <div className="mt-4 flex justify-end">
