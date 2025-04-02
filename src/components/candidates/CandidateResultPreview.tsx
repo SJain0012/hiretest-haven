@@ -40,7 +40,7 @@ const CandidateResultPreview: React.FC<CandidateResultPreviewProps> = ({
     <div className="p-4 bg-slate-50 border-t">
       <h3 className="text-lg font-semibold mb-2">Results Summary for {candidate.name}</h3>
       <div className="flex flex-col md:flex-row gap-4">
-        <div className="h-64 md:flex-1">
+        <div className="md:flex-1">
           <PersonalityChart 
             data={mockTraits} 
             candidateName={candidate.name}
