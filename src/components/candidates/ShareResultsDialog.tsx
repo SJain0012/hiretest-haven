@@ -12,7 +12,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import PersonalityChart from '@/components/results/PersonalityChart';
-import { toast } from 'sonner';
 import { Candidate } from '@/types/candidate';
 import { mockTraits } from '@/data/mockData';
 
@@ -22,6 +21,7 @@ interface ShareResultsDialogProps {
   candidate: Candidate | null;
   shareNote: string;
   setShareNote: (note: string) => void;
+  onSendShare: () => void;
 }
 
 const ShareResultsDialog: React.FC<ShareResultsDialogProps> = ({
@@ -29,14 +29,9 @@ const ShareResultsDialog: React.FC<ShareResultsDialogProps> = ({
   onOpenChange,
   candidate,
   shareNote,
-  setShareNote
+  setShareNote,
+  onSendShare
 }) => {
-  const handleSendShare = () => {
-    toast.success('Results shared successfully with the hiring manager!');
-    onOpenChange(false);
-    setShareNote('');
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -70,7 +65,7 @@ const ShareResultsDialog: React.FC<ShareResultsDialogProps> = ({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button type="button" onClick={handleSendShare}>
+          <Button type="button" onClick={onSendShare}>
             <Share2 className="h-4 w-4 mr-2" />
             Send to Hiring Manager
           </Button>
