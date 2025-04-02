@@ -6,10 +6,39 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Mail, Download } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import PersonalityChart from '@/components/results/PersonalityChart';
+import CandidateInsights from '@/components/results/CandidateInsights';
 import { mockCandidates, mockTraits } from '@/data/mockData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+
+// Sample insights - in a real app these would come from an API or analysis of the candidate's answers
+const mockInsights = [
+  {
+    type: 'finding' as const,
+    text: 'Shows exceptional problem-solving abilities under pressure'
+  },
+  {
+    type: 'finding' as const,
+    text: 'Demonstrates strong collaborative tendencies with high agreeableness'
+  },
+  {
+    type: 'finding' as const,
+    text: 'Excellent at detailed work requiring concentration'
+  },
+  {
+    type: 'question' as const,
+    text: 'How do you prioritize competing deadlines?'
+  },
+  {
+    type: 'question' as const,
+    text: 'Can you describe a situation where you had to adapt quickly to change?'
+  },
+  {
+    type: 'question' as const,
+    text: 'What strategies do you use to maintain focus on complex tasks?'
+  }
+];
 
 const CandidateResults = () => {
   const { id } = useParams<{ id: string }>();
@@ -86,8 +115,9 @@ const CandidateResults = () => {
           </div>
           
           <div className="grid gap-6 md:grid-cols-3 animate-fade-in">
-            <div className="md:col-span-2">
+            <div className="md:col-span-2 space-y-6">
               <PersonalityChart data={mockTraits} candidateName={candidate.name} />
+              <CandidateInsights candidateName={candidate.name} insights={mockInsights} />
             </div>
             
             <div className="space-y-6">
