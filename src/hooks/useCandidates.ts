@@ -63,9 +63,8 @@ export const useCandidates = () => {
         throw new Error('No active session');
       }
       
-      // TODO: Replace this with actual test fetching logic once tests table is set up
       const { data, error } = await supabase
-        .from('Tests') // Assuming a Tests table exists
+        .from('Tests')
         .select('*')
         .eq('status', 'active');
       

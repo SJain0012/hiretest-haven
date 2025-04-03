@@ -29,8 +29,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Candidate } from '@/types/candidate';
-import { useAuth } from '@/hooks/useAuth';
-import { toast } from 'sonner';
 import { Check } from 'lucide-react';
 import { useCandidates } from '@/hooks/useCandidates';
 
@@ -54,7 +52,6 @@ const InviteCandidatesDialog: React.FC<InviteCandidatesDialogProps> = ({
   onOpenChange,
   onInviteSent
 }) => {
-  const { session } = useAuth();
   const { tests, addCandidate } = useCandidates();
   
   const form = useForm<FormValues>({
@@ -82,7 +79,12 @@ const InviteCandidatesDialog: React.FC<InviteCandidatesDialogProps> = ({
       // Simulate invitation sending
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      toast.success('Invitation sent successfully!');
+      // Show success toast with a checkmark
+      const successToast = toast.success('Invitation Sent', {
+        description: `Invitation sent to ${values.name}`,
+        icon: <Check className="h-4 w-4" />,
+      });
+      
       onInviteSent(newCandidate);
       
       // Reset form and close dialog
