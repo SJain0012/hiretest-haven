@@ -1,13 +1,11 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { TableCell, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { CollapsibleContent } from '@/components/ui/collapsible';
+import { Candidate } from '@/types/candidate';
+import CandidateProfile from './CandidateProfile';
+import CandidateStatus from './CandidateStatus';
 import CandidateRowActions from './CandidateRowActions';
-import CandidateResultPreview from './CandidateResultPreview';
-import { Candidate, statusColorMap } from '@/types/candidate';
+import CandidateExpandedRow from './CandidateExpandedRow';
 
 interface CandidateRowProps {
   candidate: Candidate;
@@ -26,6 +24,8 @@ const CandidateRow: React.FC<CandidateRowProps> = ({
   toggleCandidateExpand,
   handleShareClick
 }) => {
+  const isExpanded = expandedCandidateId === candidate.id;
+  
   return (
     <React.Fragment>
       <TableRow 
@@ -36,26 +36,15 @@ const CandidateRow: React.FC<CandidateRowProps> = ({
         style={{ cursor: onCandidateSelect ? 'pointer' : 'default' }}
       >
         <TableCell>
-          <div className="flex items-center gap-3">
-            <Avatar className="h-8 w-8">
-              <AvatarImage alt={candidate.name} />
-              <AvatarFallback className="text-xs">
-                {candidate.name.split(' ').map(n => n[0]).join('')}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col">
-              <Link to={`/candidates/${candidate.id}`} className="font-medium hover:underline">
-                {candidate.name}
-              </Link>
-              <span className="text-xs text-muted-foreground">{candidate.email}</span>
-            </div>
-          </div>
+          <CandidateProfile 
+            name={candidate.name}
+            email={candidate.email}
+            id={candidate.id}
+          />
         </TableCell>
         <TableCell>{candidate.testName}</TableCell>
         <TableCell>
-          <Badge variant="outline" className={statusColorMap[candidate.status]}>
-            {candidate.status.charAt(0).toUpperCase() + candidate.status.slice(1)}
-          </Badge>
+          <CandidateStatus status={candidate.status} />
         </TableCell>
         <TableCell className="text-muted-foreground">
           {candidate.completedDate 
@@ -72,18 +61,12 @@ const CandidateRow: React.FC<CandidateRowProps> = ({
           />
         </TableCell>
       </TableRow>
-      {expandedCandidateId === candidate.id && candidate.status === 'completed' && (
-        <TableRow>
-          <TableCell colSpan={5} className="p-0">
-            <CollapsibleContent>
-              <CandidateResultPreview
-                candidate={candidate}
-                onShareClick={handleShareClick}
-              />
-            </CollapsibleContent>
-          </TableCell>
-        </TableRow>
-      )}
+      
+      <CandidateExpandedRow 
+        isExpanded={isExpanded}
+        candidate={candidate}
+        onShareClick={handleShareClick}
+      />
     </React.Fragment>
   );
 };

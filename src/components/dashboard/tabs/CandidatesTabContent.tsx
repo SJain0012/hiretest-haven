@@ -10,6 +10,7 @@ import {
 import CandidateRow from '@/components/candidates/CandidateRow';
 import ShareResultsDialog from '@/components/candidates/ShareResultsDialog';
 import { Candidate } from '@/types/candidate';
+import { toast } from 'sonner';
 
 interface CandidatesTabContentProps {
   candidates: Candidate[];
@@ -32,6 +33,12 @@ const CandidatesTabContent: React.FC<CandidatesTabContentProps> = ({
     setCurrentCandidate(candidate);
     setShareDialogOpen(true);
     setShareNote(`I'd like to share the assessment results for ${candidate.name}. They scored well on the ${candidate.testName} assessment.`);
+  };
+
+  const handleSendShare = () => {
+    toast.success('Results shared successfully with the hiring manager!');
+    setShareDialogOpen(false);
+    setShareNote('');
   };
 
   const toggleCandidateExpand = (e: React.MouseEvent, candidateId: string) => {
@@ -74,6 +81,7 @@ const CandidatesTabContent: React.FC<CandidatesTabContentProps> = ({
         candidate={currentCandidate}
         shareNote={shareNote}
         setShareNote={setShareNote}
+        onSendShare={handleSendShare}
       />
     </>
   );
