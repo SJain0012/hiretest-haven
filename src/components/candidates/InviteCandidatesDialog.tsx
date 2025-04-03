@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -29,9 +29,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Candidate } from '@/types/candidate';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { mockTests } from '@/data/mockData';
+import { toast } from 'sonner';
+import { Check } from 'lucide-react';
+import { useCandidates } from '@/hooks/useCandidates';
 
 interface InviteCandidatesDialogProps {
   open: boolean;
@@ -53,9 +54,8 @@ const InviteCandidatesDialog: React.FC<InviteCandidatesDialogProps> = ({
   onOpenChange,
   onInviteSent
 }) => {
-  const [tests, setTests] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const { session } = useAuth();
+  const { tests, addCandidate } = useCandidates();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -66,78 +66,40 @@ const InviteCandidatesDialog: React.FC<InviteCandidatesDialogProps> = ({
     },
   });
 
-  // Fetch tests when dialog opens
-  useEffect(() => {
-    if (open) {
-      const fetchTests = async () => {
-        if (session) {
-          // TODO: Replace with actual test fetch from Supabase when tests table is available
-          // For now, using mockTests
-          setTests(mockTests);
-        } else {
-          setTests(mockTests);
-        }
-      };
-
-      fetchTests();
-      form.reset();
-    }
-  }, [open, session, form]);
+  const { isSubmitting, isValid } = form.formState;
 
   const onSubmit = async (values: FormValues) => {
-    setIsLoading(true);
-    
     try {
       const selectedTest = tests.find(test => test.id === values.testId);
       const testName = selectedTest ? selectedTest.name : 'General Assessment';
 
-      if (session) {
-        // Insert into Supabase
-        const { data, error } = await supabase
-          .from('Candidates')
-          .insert([
-            { 
-              Name: values.name,
-              Email: values.email,
-              Status: 'pending',
-              Company: 'XYZ', // Using XYZ as requested
-              testName: testName // Note: We need to make sure this column exists
-            }
-          ])
-          .select('*')
-          .single();
+      const newCandidate = await addCandidate(
+        values.name, 
+        values.email, 
+        testName
+      );
 
-        if (error) throw error;
-        
-        // Create a new candidate object to add to the UI
-        const newCandidate: Candidate = {
-          id: data.id.toString(),
-          name: data.Name,
-          email: data.Email,
-          status: 'pending',
-          testName: testName,
-          // No completedDate for a new invitation
-        };
-        
-        onInviteSent(newCandidate);
-      } else {
-        // Demo mode: create a mock candidate
-        const mockCandidate: Candidate = {
-          id: `mock-${Date.now()}`,
-          name: values.name,
-          email: values.email,
-          status: 'pending',
-          testName: testName,
-        };
-        
-        onInviteSent(mockCandidate);
-      }
+      // Simulate invitation sending
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast.success('Invitation sent successfully!');
+      onInviteSent(newCandidate);
+      
+      // Reset form and close dialog
+      form.reset();
+      onOpenChange(false);
     } catch (error) {
       console.error('Error sending invitation:', error);
-    } finally {
-      setIsLoading(false);
+      toast.error('Failed to send invitation');
     }
   };
+
+  // Reset form when dialog opens/closes
+  useEffect(() => {
+    if (open) {
+      form.reset();
+    }
+  }, [open, form]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -212,12 +174,15 @@ const InviteCandidatesDialog: React.FC<InviteCandidatesDialogProps> = ({
                 type="button" 
                 variant="outline" 
                 onClick={() => onOpenChange(false)}
-                disabled={isLoading}
+                disabled={isSubmitting}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? 'Sending...' : 'Send Invitation'}
+              <Button 
+                type="submit" 
+                disabled={isSubmitting || !isValid}
+              >
+                {isSubmitting ? 'Sending...' : 'Send Invitation'}
               </Button>
             </DialogFooter>
           </form>

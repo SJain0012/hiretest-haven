@@ -5,8 +5,16 @@ import { Candidate } from '@/types/candidate';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 
+// Define a type for tests to match our usage
+export interface Test {
+  id: string;
+  name: string;
+  status: "active" | "draft" | "archived";
+}
+
 export const useCandidates = () => {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [tests, setTests] = useState<Test[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const { session } = useAuth();
@@ -44,6 +52,35 @@ export const useCandidates = () => {
       toast.error('Failed to load candidates');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchTests = async () => {
+    setIsLoading(true);
+    
+    try {
+      if (!session) {
+        throw new Error('No active session');
+      }
+      
+      // TODO: Replace this with actual test fetching logic once tests table is set up
+      const { data, error } = await supabase
+        .from('Tests') // Assuming a Tests table exists
+        .select('*')
+        .eq('status', 'active');
+      
+      if (error) throw error;
+      
+      const mappedTests = (data || []).map(test => ({
+        id: test.id.toString(),
+        name: test.name,
+        status: test.status as Test['status']
+      }));
+      
+      setTests(mappedTests);
+    } catch (error) {
+      console.error('Error fetching tests:', error);
+      toast.error('Failed to load tests');
     }
   };
 
@@ -90,11 +127,13 @@ export const useCandidates = () => {
   useEffect(() => {
     if (session) {
       fetchCandidates();
+      fetchTests();
     }
   }, [session]);
 
   return {
     candidates,
+    tests,
     isLoading,
     error,
     fetchCandidates,
