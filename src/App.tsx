@@ -4,7 +4,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/hooks/useAuth";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
+import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import TestsList from "./pages/TestsList";
 import TestCreate from "./pages/TestCreate";
@@ -21,26 +24,61 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/tests" element={<TestsList />} />
-          <Route path="/tests/create" element={<TestCreate />} />
-          <Route path="/tests/:id/invite" element={<TestInvite />} />
-          <Route path="/candidates" element={<CandidatesList />} />
-          <Route path="/candidates/:id/results" element={<CandidateResults />} />
-          <Route path="/take-test/:testId" element={<TestTake />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/team" element={<TeamPage />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute allowDemo={true}>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/tests" element={
+              <ProtectedRoute>
+                <TestsList />
+              </ProtectedRoute>
+            } />
+            <Route path="/tests/create" element={
+              <ProtectedRoute>
+                <TestCreate />
+              </ProtectedRoute>
+            } />
+            <Route path="/tests/:id/invite" element={
+              <ProtectedRoute>
+                <TestInvite />
+              </ProtectedRoute>
+            } />
+            <Route path="/candidates" element={
+              <ProtectedRoute>
+                <CandidatesList />
+              </ProtectedRoute>
+            } />
+            <Route path="/candidates/:id/results" element={
+              <ProtectedRoute>
+                <CandidateResults />
+              </ProtectedRoute>
+            } />
+            <Route path="/take-test/:testId" element={<TestTake />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/team" element={
+              <ProtectedRoute>
+                <TeamPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

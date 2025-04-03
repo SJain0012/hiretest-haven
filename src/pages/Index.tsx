@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -23,6 +24,7 @@ const formSchema = z.object({
 
 const Index = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useAuth();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,6 +51,35 @@ const Index = () => {
       <Navbar />
       <main className="flex-1 pt-16">
         <HeroSection />
+        
+        {/* New CTA section with auth links */}
+        <section className="w-full py-12 bg-blue-50">
+          <div className="container px-4 md:px-6 text-center">
+            <h2 className="text-3xl font-bold mb-4">Ready to find the perfect candidates?</h2>
+            <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
+              Get started with HireTest Haven today and transform your hiring process.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              {user ? (
+                <Link to="/dashboard">
+                  <Button className="btn-blue-gradient">Go to Dashboard</Button>
+                </Link>
+              ) : (
+                <>
+                  <Link to="/auth?tab=signup">
+                    <Button className="btn-blue-gradient">Create Account</Button>
+                  </Link>
+                  <Link to="/auth">
+                    <Button variant="outline">Sign In</Button>
+                  </Link>
+                  <Link to="/dashboard?demo=true">
+                    <Button variant="link">View Demo Dashboard</Button>
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        </section>
         
         {/* Culture Fit Section */}
         <section className="w-full py-24 bg-blue-gradient-soft">
