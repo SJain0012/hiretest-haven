@@ -4,9 +4,16 @@ import { Candidate } from '@/types/candidate';
 import PersonalityChart from '@/components/results/PersonalityChart';
 import CandidateInsights from '@/components/results/CandidateInsights';
 
+// Define the PersonalityTrait interface to match what PersonalityChart expects
+interface PersonalityTrait {
+  trait: string;
+  score: number;
+  description: string;
+}
+
 interface CandidateResultsSectionProps {
   selectedCandidate: Candidate | null;
-  mockTraits: Array<{ name: string; value: number }>;
+  mockTraits: PersonalityTrait[];
   mockInsights: Array<{ type: 'finding' | 'question'; text: string }>;
 }
 
