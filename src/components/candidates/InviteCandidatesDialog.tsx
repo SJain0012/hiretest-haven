@@ -31,6 +31,7 @@ import { Input } from '@/components/ui/input';
 import { Candidate } from '@/types/candidate';
 import { Check } from 'lucide-react';
 import { useCandidates } from '@/hooks/useCandidates';
+import { toast } from 'sonner';
 
 interface InviteCandidatesDialogProps {
   open: boolean;
@@ -80,7 +81,7 @@ const InviteCandidatesDialog: React.FC<InviteCandidatesDialogProps> = ({
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Show success toast with a checkmark
-      const successToast = toast.success('Invitation Sent', {
+      toast.success('Invitation Sent', {
         description: `Invitation sent to ${values.name}`,
         icon: <Check className="h-4 w-4" />,
       });
@@ -159,11 +160,17 @@ const InviteCandidatesDialog: React.FC<InviteCandidatesDialogProps> = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {tests.map((test) => (
-                        <SelectItem key={test.id} value={test.id}>
-                          {test.name}
-                        </SelectItem>
-                      ))}
+                      {tests.length === 0 ? (
+                        <div className="p-2 text-sm text-muted-foreground">
+                          No active tests available. Create one first!
+                        </div>
+                      ) : (
+                        tests.map((test) => (
+                          <SelectItem key={test.id} value={test.id}>
+                            {test.name}
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />

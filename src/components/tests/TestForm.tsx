@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { PlusCircle, X, GripVertical, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Question {
   id: string;
@@ -36,10 +41,13 @@ interface Question {
 
 const TestForm = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { session } = useAuth();
   const [testName, setTestName] = useState('');
   const [testDescription, setTestDescription] = useState('');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const addQuestion = (type: Question['type']) => {
     const newQuestion: Question = {
@@ -111,7 +119,7 @@ const TestForm = () => {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, asDraft: boolean = false) => {
     e.preventDefault();
     
     if (!testName.trim()) {
@@ -141,13 +149,47 @@ const TestForm = () => {
       });
       return;
     }
+
+    setIsSubmitting(true);
     
-    console.log({ testName, testDescription, questions });
-    
-    toast({
-      title: "Test Created",
-      description: "Your personality test has been created successfully.",
-    });
+    try {
+      // Prepare test data
+      const testData = {
+        name: testName,
+        description: testDescription,
+        questions: JSON.stringify(questions),
+        status: asDraft ? 'draft' : 'active',
+        // If we have a company_id in session, we could add it here
+      };
+      
+      // Save to Supabase
+      const { data, error } = await supabase
+        .from('Tests')
+        .insert([testData])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      console.log('Test created:', data);
+      
+      toast({
+        title: asDraft ? "Test Saved as Draft" : "Test Created",
+        description: `Your personality test "${testName}" has been ${asDraft ? 'saved as a draft' : 'created successfully'}.`,
+      });
+      
+      // Navigate back to tests list
+      navigate('/tests');
+    } catch (error) {
+      console.error('Error creating test:', error);
+      toast({
+        title: "Error Creating Test",
+        description: "There was a problem saving your test. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const addAIGeneratedQuestions = (generatedQuestions: Question[]) => {
@@ -161,7 +203,7 @@ const TestForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 animate-fade-in">
+    <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-8 animate-fade-in">
       <div className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="test-name">Test Name</Label>
@@ -374,10 +416,21 @@ const TestForm = () => {
       </div>
 
       <div className="flex gap-2 justify-end pt-4">
-        <Button variant="outline" type="button">
+        <Button 
+          variant="outline" 
+          type="button" 
+          onClick={(e) => handleSubmit(e, true)}
+          disabled={isSubmitting}
+        >
           Save as Draft
         </Button>
-        <Button type="submit" className="btn-hover">Create Test</Button>
+        <Button 
+          type="submit" 
+          className="btn-hover"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Creating...' : 'Create Test'}
+        </Button>
       </div>
     </form>
   );

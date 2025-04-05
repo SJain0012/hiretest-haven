@@ -80,6 +80,8 @@ export const useCandidates = () => {
     } catch (error) {
       console.error('Error fetching tests:', error);
       toast.error('Failed to load tests');
+    } finally {
+      setIsLoading(false);
     }
   };
 
