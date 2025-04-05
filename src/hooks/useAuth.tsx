@@ -28,11 +28,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
 
     // Then check for an existing session
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      setIsLoading(false);
-    });
+    supabase.auth.getSession()
+      .then(({ data: { session: currentSession } }) => {
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        setIsLoading(false);
+      })
+      .catch(error => {
+        console.error("Error fetching session:", error);
+        // Continue without a session if there's a network error
+        setIsLoading(false);
+      });
 
     return () => {
       subscription.unsubscribe();
@@ -40,7 +46,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
 
   const value = {

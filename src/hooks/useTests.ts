@@ -37,7 +37,23 @@ export const useTests = () => {
       }
     } catch (error) {
       console.error('Error fetching tests:', error);
-      toast.error('Failed to load tests');
+      // Only show error toast if it's not a network error, to avoid too many error messages
+      if (!(error instanceof TypeError && error.message.includes('Failed to fetch'))) {
+        toast.error('Failed to load tests');
+      }
+      // Use mock data in case of network errors during development/preview
+      if (process.env.NODE_ENV !== 'production') {
+        setTests([
+          {
+            id: 'mock-1',
+            name: 'Demo Test (Offline Mode)',
+            status: 'active',
+            createdAt: new Date().toISOString(),
+            candidatesCount: 5,
+            completionRate: 60,
+          }
+        ]);
+      }
     } finally {
       setIsLoading(false);
     }
