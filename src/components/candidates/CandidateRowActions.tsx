@@ -1,89 +1,84 @@
 
 import React from 'react';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Eye, MoreHorizontal, Mail, PieChart, Share2 } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Collapsible, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { MoreHorizontal, Mail, Share2, Eye, Trash2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Candidate } from '@/types/candidate';
 
 interface CandidateRowActionsProps {
   candidate: Candidate;
-  expandedCandidateId: string | null;
-  onCandidateSelect?: (candidate: Candidate) => void;
-  toggleCandidateExpand: (e: React.MouseEvent, candidateId: string) => void;
   handleShareClick: (e: React.MouseEvent, candidate: Candidate) => void;
 }
 
-const CandidateRowActions: React.FC<CandidateRowActionsProps> = ({
+const CandidateRowActions: React.FC<CandidateRowActionsProps> = ({ 
   candidate,
-  expandedCandidateId,
-  onCandidateSelect,
-  toggleCandidateExpand,
   handleShareClick
 }) => {
+  let testLinkUrl = '';
+  
+  // Check if we have a testId, use that to generate the test link
+  if (candidate.testId) {
+    testLinkUrl = `/take-test/${candidate.testId}?cid=${candidate.id}`;
+  } else {
+    // Fallback - we could use a mock test ID as fallback
+    testLinkUrl = `/take-test/mock1?cid=${candidate.id}`;
+  }
+  
   return (
-    <div className="flex justify-end gap-2">
-      {candidate.status === 'completed' && (
-        <>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={(e) => {
-              e.stopPropagation();
-              onCandidateSelect && onCandidateSelect(candidate);
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <MoreHorizontal className="h-4 w-4" />
+          <span className="sr-only">Open menu</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-[160px]">
+        <DropdownMenuItem>
+          <Mail className="mr-2 h-4 w-4" />
+          <span>Resend</span>
+        </DropdownMenuItem>
+        
+        <DropdownMenuItem 
+          onClick={(e) => handleShareClick(e, candidate)}
+          disabled={candidate.status !== 'completed'}
+        >
+          <Share2 className="mr-2 h-4 w-4" />
+          <span>Share</span>
+        </DropdownMenuItem>
+        
+        <DropdownMenuSeparator />
+        
+        {candidate.status === 'completed' ? (
+          <DropdownMenuItem asChild>
+            <Link to={`/candidates/${candidate.id}`}>
+              <Eye className="mr-2 h-4 w-4" />
+              <span>View Results</span>
+            </Link>
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem 
+            onClick={() => {
+              navigator.clipboard.writeText(window.location.origin + testLinkUrl);
+              // Show toast notification
+              const toast = document.createElement('div');
+              toast.innerText = 'Test link copied to clipboard';
+              toast.className = 'fixed top-4 right-4 bg-black text-white p-2 rounded shadow-lg z-50';
+              document.body.appendChild(toast);
+              setTimeout(() => document.body.removeChild(toast), 2000);
             }}
           >
-            <PieChart className="h-4 w-4" />
-            <span className="sr-only">Results</span>
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={(e) => handleShareClick(e, candidate)}
-          >
-            <Share2 className="h-4 w-4" />
-            <span className="sr-only">Share</span>
-          </Button>
-          <Collapsible>
-            <CollapsibleTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={(e) => toggleCandidateExpand(e, candidate.id)}
-                className={expandedCandidateId === candidate.id ? "bg-blue-100" : ""}
-              >
-                <Eye className="h-4 w-4" />
-                <span className="sr-only">View</span>
-              </Button>
-            </CollapsibleTrigger>
-          </Collapsible>
-        </>
-      )}
-      {candidate.status === 'pending' && (
-        <Button variant="ghost" size="icon" onClick={(e) => e.stopPropagation()}>
-          <Mail className="h-4 w-4" />
-          <span className="sr-only">Resend</span>
-        </Button>
-      )}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-          <Button variant="ghost" size="icon">
-            <MoreHorizontal className="h-4 w-4" />
-            <span className="sr-only">More</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem>View Profile</DropdownMenuItem>
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem className="text-destructive">Remove</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+            <Eye className="mr-2 h-4 w-4" />
+            <span>Copy Test Link</span>
+          </DropdownMenuItem>
+        )}
+        
+        <DropdownMenuItem className="text-destructive">
+          <Trash2 className="mr-2 h-4 w-4" />
+          <span>Delete</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import InviteForm from '@/components/candidates/InviteForm';
-import { mockTests } from '@/data/mockData';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -22,13 +21,15 @@ const TestInvite = () => {
       setIsLoading(true);
       
       try {
-        if (session) {
-          // TODO: Replace with actual test fetch from Supabase when tests table is available
-          const foundTest = mockTests.find((t) => t.id === id);
-          setTest(foundTest || null);
-        } else {
-          const foundTest = mockTests.find((t) => t.id === id);
-          setTest(foundTest || null);
+        if (session && id) {
+          const { data, error } = await supabase
+            .from('Tests')
+            .select('*')
+            .eq('id', id)
+            .single();
+            
+          if (error) throw error;
+          setTest(data || null);
         }
       } catch (error) {
         console.error('Error fetching test:', error);
@@ -42,24 +43,28 @@ const TestInvite = () => {
   }, [id, session]);
 
   const handleInviteSend = async (emails: string[], subject: string, message: string) => {
-    if (!test) {
+    if (!test || !id) {
       toast.error('Test information is missing');
-      return;
+      return false;
     }
     
     try {
       if (session) {
         // Process each email and add to database
         const promises = emails.map(async (email) => {
+          // Use the email username as a simple name
+          const candidateName = email.split('@')[0];
+          
           const { error } = await supabase
             .from('Candidates')
             .insert([
               { 
-                Name: email.split('@')[0], // Simple name extraction from email
+                Name: candidateName,
                 Email: email,
                 Status: 'pending',
-                Company: 'XYZ', // Using XYZ as requested
-                testName: test.name
+                Company: 'XYZ',  // Using XYZ as requested
+                testName: test.name,
+                test_id: id  // Link candidate to the specific test
               }
             ]);
             

@@ -42,6 +42,8 @@ export const useCandidates = () => {
         email: candidate.Email || '',
         status: (candidate.Status?.toLowerCase() || 'pending') as 'pending' | 'completed' | 'expired',
         testName: candidate.testName || 'General Assessment',
+        testId: candidate.test_id || undefined,
+        results: candidate.results || null,
         completedDate: candidate.Completed_On || undefined,
       }));
       
@@ -85,23 +87,28 @@ export const useCandidates = () => {
     }
   };
 
-  const addCandidate = async (name: string, email: string, testName: string) => {
+  const addCandidate = async (name: string, email: string, testName: string, testId?: string) => {
     try {
       if (!session) {
         throw new Error('No active session');
       }
       
+      const candidateData: any = { 
+        Name: name,
+        Email: email,
+        Status: 'pending',
+        Company: 'XYZ', // Using XYZ as requested
+        testName: testName
+      };
+      
+      // Add test_id if provided
+      if (testId) {
+        candidateData.test_id = testId;
+      }
+      
       const { data, error } = await supabase
         .from('Candidates')
-        .insert([
-          { 
-            Name: name,
-            Email: email,
-            Status: 'pending',
-            Company: 'XYZ', // Using XYZ as requested
-            testName: testName
-          }
-        ])
+        .insert([candidateData])
         .select('*')
         .single();
       
@@ -114,6 +121,7 @@ export const useCandidates = () => {
         email: data.Email,
         status: 'pending',
         testName: testName,
+        testId: data.test_id || undefined,
       };
       
       setCandidates(prev => [newCandidate, ...prev]);

@@ -154,13 +154,18 @@ const TestForm = () => {
     
     try {
       // Prepare test data
+      const questionsData = JSON.stringify(questions);
+      
       const testData = {
         name: testName,
         description: testDescription,
-        questions: JSON.stringify(questions),
+        questions: questionsData,
+        questions_count: questions.length,
         status: asDraft ? 'draft' : 'active',
         // If we have a company_id in session, we could add it here
       };
+      
+      console.log('Saving test data:', testData);
       
       // Save to Supabase
       const { data, error } = await supabase
@@ -169,7 +174,10 @@ const TestForm = () => {
         .select()
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
       
       console.log('Test created:', data);
       

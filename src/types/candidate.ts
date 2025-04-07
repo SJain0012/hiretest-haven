@@ -5,6 +5,8 @@ export interface Candidate {
   email: string;
   status: "pending" | "completed" | "expired";
   testName: string;
+  testId?: string;
+  results?: any;
   completedDate?: string;
 }
 

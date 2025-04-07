@@ -69,12 +69,18 @@ const InviteCandidatesDialog: React.FC<InviteCandidatesDialogProps> = ({
   const onSubmit = async (values: FormValues) => {
     try {
       const selectedTest = tests.find(test => test.id === values.testId);
-      const testName = selectedTest ? selectedTest.name : 'General Assessment';
+      if (!selectedTest) {
+        toast.error('Selected test not found');
+        return;
+      }
+      
+      const testName = selectedTest.name;
 
       const newCandidate = await addCandidate(
         values.name, 
         values.email, 
-        testName
+        testName,
+        values.testId
       );
 
       // Simulate invitation sending
