@@ -12,6 +12,20 @@ export interface Test {
   status: "active" | "draft" | "archived";
 }
 
+// Define a type for the raw data from Supabase
+interface RawCandidate {
+  id: number;
+  Name: string;
+  Email: string;
+  Status: string;
+  Company: string;
+  testName: string;
+  test_id?: string;
+  results?: any;
+  Completed_On?: string;
+  created_at: string;
+}
+
 export const useCandidates = () => {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [tests, setTests] = useState<Test[]>([]);
@@ -36,15 +50,15 @@ export const useCandidates = () => {
       if (error) throw error;
       
       // Map Supabase data to match our Candidate type
-      const mappedCandidates = data.map(candidate => ({
+      const mappedCandidates = (data as RawCandidate[]).map(candidate => ({
         id: candidate.id.toString(),
         name: candidate.Name || '',
         email: candidate.Email || '',
         status: (candidate.Status?.toLowerCase() || 'pending') as 'pending' | 'completed' | 'expired',
         testName: candidate.testName || 'General Assessment',
-        testId: candidate.test_id || undefined,
-        results: candidate.results || null,
-        completedDate: candidate.Completed_On || undefined,
+        testId: candidate.test_id,
+        results: candidate.results,
+        completedDate: candidate.Completed_On,
       }));
       
       setCandidates(mappedCandidates);
@@ -121,7 +135,7 @@ export const useCandidates = () => {
         email: data.Email,
         status: 'pending',
         testName: testName,
-        testId: data.test_id || undefined,
+        testId: data.test_id,
       };
       
       setCandidates(prev => [newCandidate, ...prev]);

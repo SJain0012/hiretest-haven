@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -8,10 +9,23 @@ import TestCompletion from '@/components/test/TestCompletion';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+// Interface for the test data from Supabase
+interface TestData {
+  id: string;
+  name: string;
+  status: string;
+  description?: string;
+  company_id?: number;
+  created_at?: string;
+  updated_at?: string;
+  questions?: string;
+  questions_count?: number;
+}
+
 const TestTake = () => {
   const { testId } = useParams<{ testId: string }>();
   const location = useLocation();
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
@@ -21,7 +35,7 @@ const TestTake = () => {
   const [isStarted, setIsStarted] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [test, setTest] = useState<any>(null);
+  const [test, setTest] = useState<TestData | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
   
   useEffect(() => {
@@ -68,10 +82,10 @@ const TestTake = () => {
             console.log('Test not found, using mock data');
             setQuestions(mockTestQuestions);
           } else if (data) {
-            setTest(data);
+            setTest(data as TestData);
             if (data.questions) {
               try {
-                const parsedQuestions = JSON.parse(data.questions);
+                const parsedQuestions = JSON.parse(data.questions as string);
                 setQuestions(parsedQuestions);
               } catch (e) {
                 console.error('Error parsing questions:', e);
@@ -97,7 +111,7 @@ const TestTake = () => {
   
   const handleStartTest = () => {
     if (!candidateName || !candidateEmail) {
-      toast({
+      uiToast({
         title: "Missing Information",
         description: "Please provide your name and email to start the test.",
         variant: "destructive",
@@ -190,7 +204,7 @@ const TestTake = () => {
     
     setIsSubmitted(true);
     
-    toast({
+    uiToast({
       title: "Test Submitted",
       description: "Thank you for completing the personality assessment.",
     });

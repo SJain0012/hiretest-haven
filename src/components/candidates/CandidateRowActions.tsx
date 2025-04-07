@@ -8,6 +8,9 @@ import { Candidate } from '@/types/candidate';
 
 interface CandidateRowActionsProps {
   candidate: Candidate;
+  expandedCandidateId?: string | null;
+  onCandidateSelect?: (candidate: Candidate) => void;
+  toggleCandidateExpand?: (e: React.MouseEvent, candidateId: string) => void;
   handleShareClick: (e: React.MouseEvent, candidate: Candidate) => void;
 }
 
