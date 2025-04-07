@@ -52,7 +52,7 @@ const TestTake = () => {
       const { data, error } = await supabase
         .from('Candidates')
         .select('*')
-        .eq('id', candidateId)
+        .eq('id', parseInt(candidateId, 10))
         .single();
         
       if (error) throw error;
@@ -139,7 +139,7 @@ const TestTake = () => {
           Email: candidateEmail,
           Status: 'in-progress',
         })
-        .eq('id', candidateId);
+        .eq('id', parseInt(candidateId, 10));
     } catch (error) {
       console.error('Error updating candidate:', error);
     }
@@ -193,7 +193,7 @@ const TestTake = () => {
             Completed_On: new Date().toISOString(),
             results: results
           })
-          .eq('id', candidateId);
+          .eq('id', parseInt(candidateId, 10));
           
         toast.success('Test submitted successfully!');
       } catch (error) {
