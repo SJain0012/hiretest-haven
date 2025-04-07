@@ -1,13 +1,12 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Textarea } from '@/components/ui/textarea';
-import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, ArrowRight, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import QuestionProgress from './QuestionProgress';
+import QuestionNavigation from './QuestionNavigation';
+import MultipleChoiceQuestion from './questionTypes/MultipleChoiceQuestion';
+import ScaleQuestion from './questionTypes/ScaleQuestion';
+import TextQuestion from './questionTypes/TextQuestion';
 
 interface Question {
   id: string;
@@ -42,9 +41,8 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
   const { toast } = useToast();
   const currentQuestion = questions[currentQuestionIndex];
   
-  // Calculate progress percentage
+  // Calculate progress
   const answeredQuestions = Object.keys(answers).length;
-  const progressPercentage = (answeredQuestions / questions.length) * 100;
   
   const handleAnswer = (value: any) => {
     setAnswers({
@@ -90,108 +88,63 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
     onSubmit();
   };
 
+  const renderQuestionContent = () => {
+    switch (currentQuestion.type) {
+      case 'multiple_choice':
+        return (
+          <MultipleChoiceQuestion
+            questionId={currentQuestion.id}
+            options={currentQuestion.options || []}
+            currentAnswer={answers[currentQuestion.id] || ''}
+            onAnswerChange={handleAnswer}
+          />
+        );
+      case 'scale':
+        return (
+          <ScaleQuestion
+            questionId={currentQuestion.id}
+            scaleMin={currentQuestion.scaleMin || 1}
+            scaleMax={currentQuestion.scaleMax || 5}
+            scaleLabels={currentQuestion.scaleLabels}
+            currentAnswer={answers[currentQuestion.id] || null}
+            onAnswerChange={handleAnswer}
+          />
+        );
+      case 'text':
+        return (
+          <TextQuestion
+            currentAnswer={answers[currentQuestion.id] || ''}
+            onAnswerChange={handleAnswer}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="max-w-2xl w-full animate-fade-in">
         <CardContent className="pt-6">
           <div className="space-y-6">
-            <div className="flex flex-col space-y-2">
-              <div className="flex justify-between items-center">
-                <div className="text-sm text-muted-foreground">
-                  Question {currentQuestionIndex + 1} of {questions.length}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {answeredQuestions} of {questions.length} answered
-                </div>
-              </div>
-              <Progress value={progressPercentage} className="h-2" />
-            </div>
+            <QuestionProgress
+              currentQuestionIndex={currentQuestionIndex}
+              totalQuestions={questions.length}
+              answeredCount={answeredQuestions}
+            />
             
             <div>
               <h2 className="text-xl font-medium mb-4">{currentQuestion.text}</h2>
-              
-              {currentQuestion.type === 'multiple_choice' && currentQuestion.options && (
-                <RadioGroup
-                  value={answers[currentQuestion.id] || ''}
-                  onValueChange={handleAnswer}
-                  className="space-y-3"
-                >
-                  {currentQuestion.options.map((option, index) => (
-                    <div key={index} className="flex items-center space-x-2">
-                      <RadioGroupItem id={`option-${index}`} value={option} />
-                      <Label htmlFor={`option-${index}`} className="cursor-pointer">
-                        {option}
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              )}
-              
-              {currentQuestion.type === 'scale' && (
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>{currentQuestion.scaleLabels?.min}</span>
-                    <span>{currentQuestion.scaleLabels?.max}</span>
-                  </div>
-                  <RadioGroup
-                    value={answers[currentQuestion.id]?.toString() || ''}
-                    onValueChange={(value) => handleAnswer(Number(value))}
-                    className="flex justify-between"
-                  >
-                    {Array.from(
-                      { length: (currentQuestion.scaleMax || 5) - (currentQuestion.scaleMin || 1) + 1 },
-                      (_, i) => (currentQuestion.scaleMin || 1) + i
-                    ).map((value) => (
-                      <div key={value} className="flex flex-col items-center gap-2">
-                        <RadioGroupItem
-                          id={`scale-${value}`}
-                          value={value.toString()}
-                          className="peer hidden"
-                        />
-                        <Label
-                          htmlFor={`scale-${value}`}
-                          className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-input bg-background text-sm transition-colors hover:bg-secondary peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground"
-                        >
-                          {value}
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                </div>
-              )}
-              
-              {currentQuestion.type === 'text' && (
-                <Textarea
-                  value={answers[currentQuestion.id] || ''}
-                  onChange={(e) => handleAnswer(e.target.value)}
-                  placeholder="Type your answer here..."
-                  className="h-32"
-                />
-              )}
+              {renderQuestionContent()}
             </div>
             
-            <div className="flex justify-between pt-4">
-              <Button
-                variant="outline"
-                onClick={goToPreviousQuestion}
-                disabled={currentQuestionIndex === 0}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Previous
-              </Button>
-              
-              {currentQuestionIndex < questions.length - 1 ? (
-                <Button onClick={goToNextQuestion}>
-                  Next
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              ) : (
-                <Button onClick={handleSubmit} className="btn-hover">
-                  Submit
-                  <Send className="ml-2 h-4 w-4" />
-                </Button>
-              )}
-            </div>
+            <QuestionNavigation
+              currentQuestionIndex={currentQuestionIndex}
+              totalQuestions={questions.length}
+              onPrevious={goToPreviousQuestion}
+              onNext={goToNextQuestion}
+              onSubmit={handleSubmit}
+            />
           </div>
         </CardContent>
       </Card>
