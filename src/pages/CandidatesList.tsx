@@ -4,65 +4,21 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import CandidatesTabContent from '@/components/dashboard/tabs/CandidatesTabContent';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import { mockCandidates } from '@/data/mockData';
 import { Candidate } from '@/types/candidate';
 import InviteCandidatesDialog from '@/components/candidates/InviteCandidatesDialog';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useCandidates } from '@/hooks/useCandidates';
 
 const CandidatesList = () => {
-  const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const { session } = useAuth();
+  const { candidates, isLoading, fetchCandidates } = useCandidates();
 
-  // Fetch candidates from Supabase when component mounts
   useEffect(() => {
-    const fetchCandidates = async () => {
-      setIsLoading(true);
-      
-      try {
-        // If user is logged in, fetch candidates from Supabase
-        if (session) {
-          const { data, error } = await supabase
-            .from('Candidates')
-            .select('*')
-            .order('created_at', { ascending: false });
-          
-          if (error) {
-            throw error;
-          }
-          
-          // Map Supabase data to match our Candidate type
-          const mappedCandidates = data.map(candidate => ({
-            id: candidate.id.toString(),
-            name: candidate.Name || '',
-            email: candidate.Email || '',
-            status: (candidate.Status?.toLowerCase() || 'pending') as 'pending' | 'completed' | 'expired',
-            testName: candidate.testName || 'General Assessment', // We'll need to add this column later
-            completedDate: candidate.Completed_On || undefined,
-          }));
-          
-          setCandidates(mappedCandidates);
-        } else {
-          // Use mock data if not logged in
-          const typedCandidates = mockCandidates.map(candidate => ({
-            ...candidate,
-            status: candidate.status as "completed" | "pending" | "expired"
-          })) as Candidate[];
-          
-          setCandidates(typedCandidates);
-        }
-      } catch (error) {
-        console.error('Error fetching candidates:', error);
-        toast.error('Failed to load candidates');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCandidates();
+    if (session) {
+      fetchCandidates();
+    }
   }, [session]);
 
   const handleInvite = () => {
@@ -70,9 +26,11 @@ const CandidatesList = () => {
   };
 
   const onInviteSent = (newCandidate: Candidate) => {
-    setCandidates(prev => [newCandidate, ...prev]);
     toast.success('Invitation sent successfully!');
     setInviteDialogOpen(false);
+    // The candidate is already added to the list in the useCandidates hook
+    // Just refresh the list to be sure
+    fetchCandidates();
   };
 
   return (
@@ -92,6 +50,17 @@ const CandidatesList = () => {
             {isLoading ? (
               <div className="flex items-center justify-center p-12">
                 <div className="text-muted-foreground">Loading candidates...</div>
+              </div>
+            ) : candidates.length === 0 ? (
+              <div className="text-center p-12 border rounded-lg bg-muted/20">
+                <h3 className="text-lg font-medium">No candidates yet</h3>
+                <p className="text-muted-foreground mt-1">Invite candidates to take tests and see their results here.</p>
+                <button 
+                  onClick={handleInvite}
+                  className="mt-4 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  Invite Your First Candidate
+                </button>
               </div>
             ) : (
               <CandidatesTabContent candidates={candidates} />
