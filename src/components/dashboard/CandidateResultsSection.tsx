@@ -22,7 +22,7 @@ const CandidateResultsSection: React.FC<CandidateResultsSectionProps> = ({
   mockTraits,
   mockInsights
 }) => {
-  if (!selectedCandidate || selectedCandidate.status !== 'completed') return null;
+  if (!selectedCandidate) return null;
   
   return (
     <div className="my-8 animate-fade-in">

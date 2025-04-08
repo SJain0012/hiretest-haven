@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
@@ -15,9 +15,36 @@ import { useTests } from '@/hooks/useTests';
 import { useCandidates } from '@/hooks/useCandidates';
 import { getDashboardStats } from '@/utils/supabaseHelpers';
 import { toast } from 'sonner';
+import { mockTraits } from '@/data/mockData';
+
+// Sample insights for candidates without proper results
+const mockInsights = [
+  {
+    type: 'finding' as const,
+    text: 'Shows strong creative problem-solving abilities'
+  },
+  {
+    type: 'finding' as const,
+    text: 'Highly collaborative with excellent team communication'
+  },
+  {
+    type: 'finding' as const,
+    text: 'Demonstrates leadership potential in group settings'
+  },
+  {
+    type: 'question' as const,
+    text: 'How do you handle conflicting priorities?'
+  },
+  {
+    type: 'question' as const,
+    text: 'What strategies do you use when facing an unfamiliar challenge?'
+  }
+];
 
 const Dashboard = () => {
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const candidateIdFromUrl = searchParams.get('candidateId');
   const isDemoMode = new URLSearchParams(location.search).get('demo') === 'true';
   
   const [isTopupOpen, setIsTopupOpen] = useState<boolean>(false);
@@ -53,7 +80,7 @@ const Dashboard = () => {
   
   // Calculate completion rate for a specific test
   const calculateCompletionRate = (testId: string): number => {
-    const candidatesForTest = supabaseCandidates.filter(c => c.testId === testId);
+    const candidatesForTest = supabaseCandidates.filter(c => c.testId === test.id);
     if (candidatesForTest.length === 0) return 0;
     
     const completedCount = candidatesForTest.filter(c => c.status === 'completed').length;
@@ -77,18 +104,50 @@ const Dashboard = () => {
     fetchStats();
   }, [isDemoMode, supabaseCandidates]);
   
-  // Find a completed candidate to show initially
+  // Effect for handling the candidateId from URL
   useEffect(() => {
-    if (supabaseCandidates.length > 0) {
+    if (candidateIdFromUrl && supabaseCandidates.length > 0) {
+      const candidate = supabaseCandidates.find(c => c.id === candidateIdFromUrl);
+      if (candidate) {
+        console.log('Setting selected candidate from URL param:', candidate);
+        setSelectedCandidate(candidate);
+        
+        // Add sample results if not present
+        if (!candidate.results) {
+          const candidateWithResults = {
+            ...candidate,
+            status: 'completed',
+            completedDate: new Date().toISOString(),
+            results: {
+              traits: mockTraits,
+              insights: mockInsights
+            }
+          };
+          setSelectedCandidate(candidateWithResults);
+        }
+      }
+    } else if (supabaseCandidates.length > 0) {
+      // Default behavior when no candidateId in URL
       const completedCandidate = supabaseCandidates.find(c => c.status === 'completed' && c.results);
       if (completedCandidate) {
         console.log('Setting selected candidate with results:', completedCandidate);
         setSelectedCandidate(completedCandidate);
       } else {
-        setSelectedCandidate(supabaseCandidates[0]);
+        // If no completed candidate, select first one but add sample results
+        const firstCandidate = supabaseCandidates[0];
+        const candidateWithResults = {
+          ...firstCandidate,
+          status: 'completed',
+          completedDate: new Date().toISOString(),
+          results: {
+            traits: mockTraits,
+            insights: mockInsights
+          }
+        };
+        setSelectedCandidate(candidateWithResults);
       }
     }
-  }, [supabaseCandidates]);
+  }, [candidateIdFromUrl, supabaseCandidates]);
   
   // Display title and description based on demo mode
   const dashboardTitle = isDemoMode 
@@ -137,11 +196,11 @@ const Dashboard = () => {
                 completionRate={dashboardStats.completionRate}
               />
               
-              {selectedCandidate && selectedCandidate.status === 'completed' && selectedCandidate.results && (
+              {selectedCandidate && (
                 <CandidateResultsSection 
                   selectedCandidate={selectedCandidate}
-                  mockTraits={selectedCandidate.results?.traits}
-                  mockInsights={selectedCandidate.results?.insights}
+                  mockTraits={selectedCandidate.results?.traits || mockTraits}
+                  mockInsights={selectedCandidate.results?.insights || mockInsights}
                 />
               )}
               

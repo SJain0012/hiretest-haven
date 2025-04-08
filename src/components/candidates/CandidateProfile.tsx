@@ -23,7 +23,7 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({
         </AvatarFallback>
       </Avatar>
       <div className="flex flex-col">
-        <Link to={`/candidates/${id}`} className="font-medium hover:underline">
+        <Link to={`/dashboard?candidateId=${id}`} className="font-medium hover:underline">
           {name}
         </Link>
         <span className="text-xs text-muted-foreground">{email}</span>
