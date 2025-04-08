@@ -32,12 +32,10 @@ export const sendTestInvitation = async (
   name: string, 
   email: string, 
   testName: string, 
+  testId?: string,
   company: string = 'XYZ'
 ) => {
   try {
-    // Ensure the testName column exists
-    await ensureTestNameColumn();
-    
     // Add the candidate to the database
     const { data, error } = await supabase
       .from('Candidates')
@@ -47,6 +45,7 @@ export const sendTestInvitation = async (
           Email: email,
           Status: 'pending',
           testName: testName,
+          test_id: testId,
           Company: company,
         }
       ])
@@ -57,9 +56,54 @@ export const sendTestInvitation = async (
     
     // In a real application, you would send an email here
     // For now, we'll just return the data
+    console.log('Candidate added successfully, skipping email sending');
     return data;
   } catch (error) {
     console.error('Error sending test invitation:', error);
+    throw error;
+  }
+};
+
+/**
+ * Helper function to get dashboard statistics
+ */
+export const getDashboardStats = async () => {
+  try {
+    // Get total tests count
+    const { data: testsData, error: testsError } = await supabase
+      .from('Tests')
+      .select('id, status', { count: 'exact' });
+    
+    if (testsError) throw testsError;
+    
+    // Get total candidates count and completion status
+    const { data: candidatesData, error: candidatesError } = await supabase
+      .from('Candidates')
+      .select('id, Status');
+    
+    if (candidatesError) throw candidatesError;
+    
+    // Calculate stats
+    const testsCount = testsData.length;
+    const activeTestsCount = testsData.filter(test => test.status === 'active').length;
+    const candidatesCount = candidatesData.length;
+    const completedTestsCount = candidatesData.filter(candidate => 
+      candidate.Status?.toLowerCase() === 'completed'
+    ).length;
+    
+    const completionRate = candidatesCount > 0 
+      ? Math.round((completedTestsCount / candidatesCount) * 100) 
+      : 0;
+    
+    return {
+      testsCount,
+      activeTestsCount,
+      candidatesCount,
+      completedTestsCount,
+      completionRate
+    };
+  } catch (error) {
+    console.error('Error getting dashboard stats:', error);
     throw error;
   }
 };

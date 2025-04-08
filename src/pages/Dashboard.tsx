@@ -1,10 +1,9 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import { mockTests, mockCandidates, mockTraits } from '@/data/mockData';
 import DashboardCards from '@/components/dashboard/DashboardCards';
 import CreditTopupDialog from '@/components/dashboard/CreditTopupDialog';
 import DashboardTabs, { DashboardTest } from '@/components/dashboard/DashboardTabs';
@@ -12,52 +11,78 @@ import { Candidate } from '@/types/candidate';
 import DashboardDemoNotice from '@/components/dashboard/DashboardDemoNotice';
 import CandidateResultsSection from '@/components/dashboard/CandidateResultsSection';
 import { useDashboardData } from '@/hooks/useDashboardData';
-
-const mockInsights = [
-  {
-    type: 'finding' as const,
-    text: 'Shows exceptional problem-solving abilities under pressure'
-  },
-  {
-    type: 'finding' as const,
-    text: 'Demonstrates strong collaborative tendencies with high agreeableness'
-  },
-  {
-    type: 'question' as const,
-    text: 'How do you prioritize competing deadlines?'
-  },
-  {
-    type: 'question' as const,
-    text: 'Can you describe a situation where you had to adapt quickly to change?'
-  }
-];
+import { useTests } from '@/hooks/useTests';
+import { useCandidates } from '@/hooks/useCandidates';
+import { supabase } from '@/integrations/supabase/client';
+import { getDashboardStats } from '@/utils/supabaseHelpers';
 
 const Dashboard = () => {
   const location = useLocation();
   const isDemoMode = new URLSearchParams(location.search).get('demo') === 'true';
   
-  // Convert mock data to typed data
-  const typedTests = mockTests.map(test => ({
-    ...test,
-    status: test.status as "active" | "draft" | "archived"
-  })) as DashboardTest[];
-  
-  const typedCandidates = mockCandidates.map(candidate => ({
-    ...candidate,
-    status: candidate.status as "completed" | "pending" | "expired"
-  })) as Candidate[];
-
-  const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(
-    typedCandidates.find(c => c.status === 'completed') || null
-  );
-
   const [isTopupOpen, setIsTopupOpen] = useState<boolean>(false);
   const { companyName, credits, updateCredits } = useDashboardData(isDemoMode);
-
-  // Dashboard metrics calculations
-  const activeTestsCount = typedTests.filter(t => t.status === 'active').length;
-  const completedTestsCount = typedCandidates.filter(c => c.status === 'completed').length;
-  const completionRate = Math.round((completedTestsCount / typedCandidates.length) * 100);
+  
+  // Use hooks to get real data
+  const { tests: supabaseTests, isLoading: isTestsLoading } = useTests();
+  const { candidates: supabaseCandidates, isLoading: isCandidatesLoading } = useCandidates();
+  
+  // Statistics state
+  const [dashboardStats, setDashboardStats] = useState({
+    testsCount: 0,
+    activeTestsCount: 0,
+    candidatesCount: 0,
+    completedTestsCount: 0,
+    completionRate: 0
+  });
+  
+  // Selected candidate state
+  const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null);
+  
+  // Format tests for dashboard display
+  const formatTests = (): DashboardTest[] => {
+    return supabaseTests.map(test => ({
+      id: test.id,
+      name: test.name,
+      status: test.status,
+      createdAt: new Date().toISOString(), // Use current date if not available
+      candidatesCount: supabaseCandidates.filter(c => c.testId === test.id).length,
+      completionRate: calculateCompletionRate(test.id)
+    }));
+  };
+  
+  // Calculate completion rate for a specific test
+  const calculateCompletionRate = (testId: string): number => {
+    const candidatesForTest = supabaseCandidates.filter(c => c.testId === testId);
+    if (candidatesForTest.length === 0) return 0;
+    
+    const completedCount = candidatesForTest.filter(c => c.status === 'completed').length;
+    return Math.round((completedCount / candidatesForTest.length) * 100);
+  };
+  
+  // Fetch dashboard statistics from Supabase
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (isDemoMode) return;
+      
+      try {
+        const stats = await getDashboardStats();
+        setDashboardStats(stats);
+      } catch (error) {
+        console.error('Error fetching dashboard stats:', error);
+      }
+    };
+    
+    fetchStats();
+  }, [isDemoMode]);
+  
+  // Find a completed candidate to show initially
+  useEffect(() => {
+    if (supabaseCandidates.length > 0) {
+      const completedCandidate = supabaseCandidates.find(c => c.status === 'completed');
+      setSelectedCandidate(completedCandidate || supabaseCandidates[0]);
+    }
+  }, [supabaseCandidates]);
   
   // Display title and description based on demo mode
   const dashboardTitle = isDemoMode 
@@ -76,6 +101,8 @@ const Dashboard = () => {
     updateCredits(addedCredits);
   };
   
+  const isLoading = isTestsLoading || isCandidatesLoading;
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -90,26 +117,36 @@ const Dashboard = () => {
             onTopUpClick={handleTopUp}
           />
           
-          <DashboardCards 
-            testsCount={typedTests.length}
-            activeTestsCount={activeTestsCount}
-            candidatesCount={typedCandidates.length}
-            completedTestsCount={completedTestsCount}
-            completionRate={completionRate}
-          />
-          
-          <CandidateResultsSection 
-            selectedCandidate={selectedCandidate}
-            mockTraits={mockTraits}
-            mockInsights={mockInsights}
-          />
-          
-          <DashboardTabs
-            tests={typedTests}
-            candidates={typedCandidates}
-            selectedCandidate={selectedCandidate}
-            onCandidateSelect={setSelectedCandidate}
-          />
+          {isLoading ? (
+            <div className="flex items-center justify-center p-12">
+              <div className="text-muted-foreground">Loading dashboard data...</div>
+            </div>
+          ) : (
+            <>
+              <DashboardCards 
+                testsCount={dashboardStats.testsCount}
+                activeTestsCount={dashboardStats.activeTestsCount}
+                candidatesCount={dashboardStats.candidatesCount}
+                completedTestsCount={dashboardStats.completedTestsCount}
+                completionRate={dashboardStats.completionRate}
+              />
+              
+              {selectedCandidate && selectedCandidate.status === 'completed' && (
+                <CandidateResultsSection 
+                  selectedCandidate={selectedCandidate}
+                  mockTraits={selectedCandidate.results?.traits}
+                  mockInsights={selectedCandidate.results?.insights}
+                />
+              )}
+              
+              <DashboardTabs
+                tests={formatTests()}
+                candidates={supabaseCandidates}
+                selectedCandidate={selectedCandidate}
+                onCandidateSelect={setSelectedCandidate}
+              />
+            </>
+          )}
 
           <CreditTopupDialog
             open={isTopupOpen}

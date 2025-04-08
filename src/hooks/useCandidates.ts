@@ -82,7 +82,7 @@ export const useCandidates = () => {
       const { data, error } = await supabase
         .from('Tests')
         .select('*')
-        .eq('status', 'active');
+        .order('created_at', { ascending: false });
       
       if (error) throw error;
       

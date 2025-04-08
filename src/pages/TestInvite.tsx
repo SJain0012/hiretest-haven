@@ -9,6 +9,7 @@ import InviteForm from '@/components/candidates/InviteForm';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { sendTestInvitation } from '@/utils/supabaseHelpers';
 
 const TestInvite = () => {
   const { id } = useParams<{ id: string }>();
@@ -49,30 +50,20 @@ const TestInvite = () => {
     }
     
     try {
-      if (session) {
-        // Process each email and add to database
-        const promises = emails.map(async (email) => {
-          // Use the email username as a simple name
-          const candidateName = email.split('@')[0];
-          
-          const { error } = await supabase
-            .from('Candidates')
-            .insert([
-              { 
-                Name: candidateName,
-                Email: email,
-                Status: 'pending',
-                Company: 'XYZ',  // Using XYZ as requested
-                testName: test.name,
-                test_id: id  // Link candidate to the specific test
-              }
-            ]);
-            
-          if (error) throw error;
-        });
+      // Process each email and add to database using our helper function
+      const promises = emails.map(async (email) => {
+        // Use the email username as a simple name
+        const candidateName = email.split('@')[0];
         
-        await Promise.all(promises);
-      }
+        await sendTestInvitation(
+          candidateName,
+          email,
+          test.name,
+          id // Pass the test ID
+        );
+      });
+      
+      await Promise.all(promises);
       
       toast.success(`Invitations sent to ${emails.length} candidate${emails.length > 1 ? 's' : ''}`);
       return true;

@@ -32,6 +32,7 @@ import { Candidate } from '@/types/candidate';
 import { Check } from 'lucide-react';
 import { useCandidates } from '@/hooks/useCandidates';
 import { toast } from 'sonner';
+import { sendTestInvitation } from '@/utils/supabaseHelpers';
 
 interface InviteCandidatesDialogProps {
   open: boolean;
@@ -53,7 +54,7 @@ const InviteCandidatesDialog: React.FC<InviteCandidatesDialogProps> = ({
   onOpenChange,
   onInviteSent
 }) => {
-  const { tests, addCandidate } = useCandidates();
+  const { tests } = useCandidates();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -76,15 +77,23 @@ const InviteCandidatesDialog: React.FC<InviteCandidatesDialogProps> = ({
       
       const testName = selectedTest.name;
 
-      const newCandidate = await addCandidate(
-        values.name, 
-        values.email, 
+      // Use the sendTestInvitation function
+      const data = await sendTestInvitation(
+        values.name,
+        values.email,
         testName,
         values.testId
       );
 
-      // Simulate invitation sending
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Create a new candidate object from the returned data
+      const newCandidate: Candidate = {
+        id: data.id.toString(),
+        name: data.Name,
+        email: data.Email,
+        status: 'pending',
+        testName: data.testName,
+        testId: data.test_id,
+      };
       
       // Show success toast with a checkmark
       toast.success('Invitation Sent', {
