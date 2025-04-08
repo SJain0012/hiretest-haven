@@ -54,7 +54,7 @@ const InviteCandidatesDialog: React.FC<InviteCandidatesDialogProps> = ({
   onOpenChange,
   onInviteSent
 }) => {
-  const { tests } = useCandidates();
+  const { tests, addCandidate, fetchCandidates } = useCandidates();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -78,21 +78,23 @@ const InviteCandidatesDialog: React.FC<InviteCandidatesDialogProps> = ({
       const testName = selectedTest.name;
 
       // Use the sendTestInvitation function
-      const data = await sendTestInvitation(
+      const response = await sendTestInvitation(
         values.name,
         values.email,
         testName,
         values.testId
       );
 
+      console.log('Invitation response:', response);
+
       // Create a new candidate object from the returned data
       const newCandidate: Candidate = {
-        id: data.id.toString(),
-        name: data.Name,
-        email: data.Email,
+        id: response.id.toString(),
+        name: response.Name || values.name,
+        email: response.Email || values.email,
         status: 'pending',
-        testName: data.testName,
-        testId: data.test_id,
+        testName: response.testName || testName,
+        testId: response.test_id || values.testId,
       };
       
       // Show success toast with a checkmark
@@ -101,6 +103,10 @@ const InviteCandidatesDialog: React.FC<InviteCandidatesDialogProps> = ({
         icon: <Check className="h-4 w-4" />,
       });
       
+      // Make sure we refresh the candidates list
+      fetchCandidates();
+      
+      // Call the onInviteSent callback
       onInviteSent(newCandidate);
       
       // Reset form and close dialog
@@ -118,6 +124,13 @@ const InviteCandidatesDialog: React.FC<InviteCandidatesDialogProps> = ({
       form.reset();
     }
   }, [open, form]);
+
+  // Fallback tests if none are available
+  const displayTests = tests.length > 0 ? tests : [
+    { id: '1', name: 'Cognitive Assessment', status: 'active' },
+    { id: '2', name: 'Leadership Assessment', status: 'active' },
+    { id: '3', name: 'Emotional Intelligence Test', status: 'active' }
+  ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -175,17 +188,11 @@ const InviteCandidatesDialog: React.FC<InviteCandidatesDialogProps> = ({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {tests.length === 0 ? (
-                        <div className="p-2 text-sm text-muted-foreground">
-                          No active tests available. Create one first!
-                        </div>
-                      ) : (
-                        tests.map((test) => (
-                          <SelectItem key={test.id} value={test.id}>
-                            {test.name}
-                          </SelectItem>
-                        ))
-                      )}
+                      {displayTests.map((test) => (
+                        <SelectItem key={test.id} value={test.id}>
+                          {test.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />

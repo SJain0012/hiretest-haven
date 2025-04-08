@@ -16,6 +16,13 @@ const CandidatesList = () => {
   const { candidates, isLoading, fetchCandidates } = useCandidates();
 
   useEffect(() => {
+    console.log('CandidatesList - initial fetch');
+    fetchCandidates();
+  }, []);
+
+  // Fetch again when session changes
+  useEffect(() => {
+    console.log('CandidatesList - session changed, fetching candidates');
     if (session) {
       fetchCandidates();
     }
@@ -25,12 +32,13 @@ const CandidatesList = () => {
     setInviteDialogOpen(true);
   };
 
-  const onInviteSent = (newCandidate: Candidate) => {
+  const onInviteSent = async (newCandidate: Candidate) => {
+    console.log('Invitation sent successfully, refreshing candidates list');
     toast.success('Invitation sent successfully!');
     setInviteDialogOpen(false);
-    // The candidate is already added to the list in the useCandidates hook
-    // Just refresh the list to be sure
-    fetchCandidates();
+    
+    // Force refresh the candidates list
+    await fetchCandidates();
   };
 
   return (
