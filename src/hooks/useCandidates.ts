@@ -49,6 +49,8 @@ export const useCandidates = () => {
       
       if (error) throw error;
       
+      console.log('Raw candidates data:', data);
+      
       // Map Supabase data to match our Candidate type
       const mappedCandidates = (data as RawCandidate[]).map(candidate => ({
         id: candidate.id.toString(),

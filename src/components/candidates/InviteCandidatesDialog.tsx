@@ -125,7 +125,7 @@ const InviteCandidatesDialog: React.FC<InviteCandidatesDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Invite Candidate</DialogTitle>
           <DialogDescription>
-            Send a test invitation to a candidate. They will receive an email with a link to take the test.
+            Send a test invitation to a candidate. The candidate will be added to your dashboard.
           </DialogDescription>
         </DialogHeader>
         

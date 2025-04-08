@@ -54,9 +54,8 @@ export const sendTestInvitation = async (
       
     if (error) throw error;
     
-    // In a real application, you would send an email here
-    // For now, we'll just return the data
-    console.log('Candidate added successfully, skipping email sending');
+    // Skip email sending, just log that we would normally send an email
+    console.log(`Would normally send email to ${email} with test invitation for "${testName}"`);
     return data;
   } catch (error) {
     console.error('Error sending test invitation:', error);
@@ -94,6 +93,14 @@ export const getDashboardStats = async () => {
     const completionRate = candidatesCount > 0 
       ? Math.round((completedTestsCount / candidatesCount) * 100) 
       : 0;
+    
+    console.log('Dashboard stats:', {
+      testsCount,
+      activeTestsCount,
+      candidatesCount,
+      completedTestsCount,
+      completionRate
+    });
     
     return {
       testsCount,

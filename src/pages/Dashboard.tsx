@@ -13,8 +13,8 @@ import CandidateResultsSection from '@/components/dashboard/CandidateResultsSect
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useTests } from '@/hooks/useTests';
 import { useCandidates } from '@/hooks/useCandidates';
-import { supabase } from '@/integrations/supabase/client';
 import { getDashboardStats } from '@/utils/supabaseHelpers';
+import { toast } from 'sonner';
 
 const Dashboard = () => {
   const location = useLocation();
@@ -70,17 +70,23 @@ const Dashboard = () => {
         setDashboardStats(stats);
       } catch (error) {
         console.error('Error fetching dashboard stats:', error);
+        toast.error('Error loading dashboard statistics');
       }
     };
     
     fetchStats();
-  }, [isDemoMode]);
+  }, [isDemoMode, supabaseCandidates]);
   
   // Find a completed candidate to show initially
   useEffect(() => {
     if (supabaseCandidates.length > 0) {
-      const completedCandidate = supabaseCandidates.find(c => c.status === 'completed');
-      setSelectedCandidate(completedCandidate || supabaseCandidates[0]);
+      const completedCandidate = supabaseCandidates.find(c => c.status === 'completed' && c.results);
+      if (completedCandidate) {
+        console.log('Setting selected candidate with results:', completedCandidate);
+        setSelectedCandidate(completedCandidate);
+      } else {
+        setSelectedCandidate(supabaseCandidates[0]);
+      }
     }
   }, [supabaseCandidates]);
   
@@ -131,7 +137,7 @@ const Dashboard = () => {
                 completionRate={dashboardStats.completionRate}
               />
               
-              {selectedCandidate && selectedCandidate.status === 'completed' && (
+              {selectedCandidate && selectedCandidate.status === 'completed' && selectedCandidate.results && (
                 <CandidateResultsSection 
                   selectedCandidate={selectedCandidate}
                   mockTraits={selectedCandidate.results?.traits}

@@ -94,7 +94,7 @@ const TestInvite = () => {
               {test && `: ${test.name}`}
             </h1>
             <p className="text-muted-foreground">
-              Send test invitations via email
+              Send test invitations to candidates
             </p>
           </div>
           
