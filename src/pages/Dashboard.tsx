@@ -80,7 +80,7 @@ const Dashboard = () => {
   
   // Calculate completion rate for a specific test
   const calculateCompletionRate = (testId: string): number => {
-    const candidatesForTest = supabaseCandidates.filter(c => c.testId === test.id);
+    const candidatesForTest = supabaseCandidates.filter(c => c.testId === testId);
     if (candidatesForTest.length === 0) return 0;
     
     const completedCount = candidatesForTest.filter(c => c.status === 'completed').length;
@@ -116,7 +116,7 @@ const Dashboard = () => {
         if (!candidate.results) {
           const candidateWithResults = {
             ...candidate,
-            status: 'completed',
+            status: 'completed' as const,
             completedDate: new Date().toISOString(),
             results: {
               traits: mockTraits,
@@ -137,7 +137,7 @@ const Dashboard = () => {
         const firstCandidate = supabaseCandidates[0];
         const candidateWithResults = {
           ...firstCandidate,
-          status: 'completed',
+          status: 'completed' as const,
           completedDate: new Date().toISOString(),
           results: {
             traits: mockTraits,
