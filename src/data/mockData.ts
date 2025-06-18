@@ -110,6 +110,29 @@ export const mockTraits = [
   },
 ];
 
+export const mockInsights = [
+  {
+    type: 'finding' as const,
+    text: 'Strong analytical and problem-solving capabilities make this candidate well-suited for complex technical challenges.',
+  },
+  {
+    type: 'finding' as const,
+    text: 'High agreeableness score indicates excellent potential for team collaboration and mentoring junior developers.',
+  },
+  {
+    type: 'question' as const,
+    text: 'How does the candidate handle high-pressure situations given their moderate emotional stability score?',
+  },
+  {
+    type: 'finding' as const,
+    text: 'Exceptional openness to experience suggests adaptability to new technologies and methodologies.',
+  },
+  {
+    type: 'question' as const,
+    text: 'Would this candidate thrive in a leadership role considering their balanced extraversion levels?',
+  },
+];
+
 export const mockTestQuestions = [
   {
     id: 'q1',
