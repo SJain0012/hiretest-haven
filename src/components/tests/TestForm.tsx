@@ -153,6 +153,21 @@ const TestForm = () => {
     setIsSubmitting(true);
     
     try {
+      if (!session) {
+        throw new Error('No active session');
+      }
+
+      // Get user's company_id
+      const { data: company, error: companyError } = await supabase
+        .from('Company')
+        .select('id')
+        .eq('user_id', session.user.id)
+        .single();
+
+      if (companyError || !company) {
+        throw new Error('No company found for user');
+      }
+
       // Prepare test data
       const questionsData = JSON.stringify(questions);
       
@@ -162,10 +177,8 @@ const TestForm = () => {
         questions: questionsData,
         questions_count: questions.length,
         status: asDraft ? 'draft' : 'active',
-        // If we have a company_id in session, we could add it here
+        company_id: company.id,
       };
-      
-      console.log('Saving test data:', testData);
       
       // Save to Supabase
       const { data, error } = await supabase
@@ -175,11 +188,8 @@ const TestForm = () => {
         .single();
       
       if (error) {
-        console.error('Supabase error:', error);
         throw error;
       }
-      
-      console.log('Test created:', data);
       
       toast({
         title: asDraft ? "Test Saved as Draft" : "Test Created",
@@ -189,7 +199,9 @@ const TestForm = () => {
       // Navigate back to tests list
       navigate('/tests');
     } catch (error) {
-      console.error('Error creating test:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error creating test:', error);
+      }
       toast({
         title: "Error Creating Test",
         description: "There was a problem saving your test. Please try again.",
