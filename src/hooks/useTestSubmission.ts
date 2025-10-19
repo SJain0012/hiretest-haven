@@ -46,6 +46,18 @@ export const useTestSubmission = ({ candidateId, testId, testName }: TestSubmiss
     if (!testId) return;
     
     try {
+      // Get user's company_id
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      
+      const { data: company } = await supabase
+        .from('Company')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+      
+      if (!company) return null;
+      
       const { data, error } = await supabase
         .from('Candidates')
         .insert([{
@@ -54,6 +66,7 @@ export const useTestSubmission = ({ candidateId, testId, testName }: TestSubmiss
           Status: 'in-progress',
           testName: testName,
           test_id: testId,
+          company_id: company.id,
         }])
         .select()
         .single();
@@ -65,7 +78,9 @@ export const useTestSubmission = ({ candidateId, testId, testName }: TestSubmiss
       }
       return null;
     } catch (error) {
-      console.error('Error creating candidate:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error creating candidate:', error);
+      }
       return null;
     }
   };

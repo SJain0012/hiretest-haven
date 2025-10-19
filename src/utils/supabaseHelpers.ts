@@ -36,9 +36,18 @@ export const sendTestInvitation = async (
   company: string = 'XYZ'
 ) => {
   try {
-    console.log('Sending test invitation with data:', { name, email, testName, testId, company });
+    // Get user's company_id
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('No authenticated user');
     
-    // First, check if we can insert directly
+    const { data: companyData } = await supabase
+      .from('Company')
+      .select('id')
+      .eq('user_id', user.id)
+      .single();
+    
+    if (!companyData) throw new Error('No company found for user');
+    
     const { data: directData, error: directError } = await supabase
       .from('Candidates')
       .insert([
@@ -49,21 +58,21 @@ export const sendTestInvitation = async (
           testName: testName,
           test_id: testId,
           Company: company,
+          company_id: companyData.id,
         }
       ])
       .select('*')
       .single();
       
     if (!directError) {
-      console.log('Successfully saved candidate to database:', directData);
       return directData;
     }
     
-    console.log('Direct insert failed with error:', directError);
-    console.log('Using fallback approach for development...');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Direct insert failed, using fallback');
+    }
     
     // For development/demo purposes - creating mock data in memory
-    // This simulates successful insertion for UI demonstration
     const mockCandidate = {
       id: Date.now(),
       Name: name,
@@ -72,27 +81,26 @@ export const sendTestInvitation = async (
       testName: testName,
       test_id: testId,
       Company: company,
+      company_id: companyData.id,
       created_at: new Date().toISOString()
     };
     
-    // Still log that we would normally send an email
-    console.log(`Would normally send email to ${email} with test invitation for "${testName}"`);
-    
-    // Add the candidate directly to local storage for development purposes
-    // This ensures the candidate appears in the UI even if database insert fails
     try {
       const existingCandidatesStr = localStorage.getItem('mock_candidates') || '[]';
       const existingCandidates = JSON.parse(existingCandidatesStr);
       existingCandidates.push(mockCandidate);
       localStorage.setItem('mock_candidates', JSON.stringify(existingCandidates));
-      console.log('Saved candidate to local storage:', mockCandidate);
     } catch (storageError) {
-      console.error('Error saving to localStorage:', storageError);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error saving to localStorage:', storageError);
+      }
     }
     
     return mockCandidate;
   } catch (error) {
-    console.error('Error sending test invitation:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error sending test invitation:', error);
+    }
     throw error;
   }
 };
@@ -144,13 +152,6 @@ export const getDashboardStats = async () => {
       ? Math.round((completedTestsCount / candidatesCount) * 100) 
       : 0;
     
-    console.log('Dashboard stats:', {
-      testsCount,
-      activeTestsCount,
-      candidatesCount,
-      completedTestsCount,
-      completionRate
-    });
     
     return {
       testsCount,
@@ -190,7 +191,6 @@ export const fetchCandidatesWithFallback = async () => {
     }
     
     if (data && data.length > 0) {
-      console.log('Successfully fetched candidates from Supabase:', data);
       return data;
     }
     
@@ -199,16 +199,15 @@ export const fetchCandidatesWithFallback = async () => {
       const mockCandidatesStr = localStorage.getItem('mock_candidates');
       if (mockCandidatesStr) {
         const mockCandidates = JSON.parse(mockCandidatesStr);
-        console.log('Using candidates from localStorage:', mockCandidates);
         if (mockCandidates.length > 0) {
           return mockCandidates;
         }
       }
     } catch (storageError) {
-      console.error('Error reading from localStorage:', storageError);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error reading from localStorage:', storageError);
+      }
     }
-    
-    console.log('No candidates found in database or localStorage, using sample data');
     
     // Return sample candidates for development/demo
     return [

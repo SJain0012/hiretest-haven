@@ -42,8 +42,6 @@ export const useCandidates = () => {
       // Use our helper function that includes fallback data
       const data = await fetchCandidatesWithFallback();
       
-      console.log('Raw candidates data:', data);
-      
       // Map Supabase data to match our Candidate type
       const mappedCandidates = (data as RawCandidate[]).map(candidate => ({
         id: candidate.id.toString(),
@@ -109,12 +107,24 @@ export const useCandidates = () => {
         throw new Error('No active session');
       }
       
+      // Get user's company_id
+      const { data: company } = await supabase
+        .from('Company')
+        .select('id')
+        .eq('user_id', session.user.id)
+        .single();
+      
+      if (!company) {
+        throw new Error('No company found for user');
+      }
+      
       const candidateData: any = { 
         Name: name,
         Email: email,
         Status: 'pending',
-        Company: 'XYZ', // Using XYZ as requested
-        testName: testName
+        Company: 'XYZ',
+        testName: testName,
+        company_id: company.id,
       };
       
       // Add test_id if provided
@@ -129,7 +139,9 @@ export const useCandidates = () => {
         .single();
       
       if (error) {
-        console.log('Error adding candidate directly, using fallback:', error);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Error adding candidate, using fallback:', error);
+        }
         
         // Use local storage as fallback for development/demo
         const mockCandidate: Candidate = {
@@ -156,9 +168,10 @@ export const useCandidates = () => {
           };
           existingCandidates.push(mockRawCandidate);
           localStorage.setItem('mock_candidates', JSON.stringify(existingCandidates));
-          console.log('Saved candidate to localStorage:', mockRawCandidate);
         } catch (storageError) {
-          console.error('Error saving to localStorage:', storageError);
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Error saving to localStorage:', storageError);
+          }
         }
         
         setCandidates(prev => [mockCandidate, ...prev]);

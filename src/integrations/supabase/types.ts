@@ -17,6 +17,7 @@ export type Database = {
       Candidates: {
         Row: {
           Company: string | null
+          company_id: number
           Completed_On: string | null
           created_at: string
           Email: string | null
@@ -29,6 +30,7 @@ export type Database = {
         }
         Insert: {
           Company?: string | null
+          company_id: number
           Completed_On?: string | null
           created_at?: string
           Email?: string | null
@@ -41,6 +43,7 @@ export type Database = {
         }
         Update: {
           Company?: string | null
+          company_id?: number
           Completed_On?: string | null
           created_at?: string
           Email?: string | null
@@ -52,6 +55,13 @@ export type Database = {
           testName?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "Candidates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "Company"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "Candidates_test_id_fkey"
             columns: ["test_id"]

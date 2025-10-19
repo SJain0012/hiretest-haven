@@ -12,18 +12,22 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowDemo = f
   const { session, isLoading } = useAuth();
   const location = useLocation();
   
-  // If demo mode is allowed for this route and there's a demo query param
-  const searchParams = new URLSearchParams(location.search);
-  const demoMode = searchParams.get('demo') === 'true';
-  
   if (isLoading) {
-    // Loading state - you can replace this with a loading component
     return <div className="flex h-screen items-center justify-center">Loading...</div>;
   }
   
-  // Allow access in demo mode if the route supports it
-  if (allowDemo && demoMode) {
-    return <>{children}</>;
+  // Demo mode only allowed in development environment
+  if (allowDemo && process.env.NODE_ENV === 'development') {
+    const searchParams = new URLSearchParams(location.search);
+    const demoMode = searchParams.get('demo') === 'true';
+    
+    if (demoMode) {
+      // Log demo access for security monitoring
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Demo mode access:', location.pathname);
+      }
+      return <>{children}</>;
+    }
   }
   
   // Redirect if not logged in
